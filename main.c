@@ -51,11 +51,13 @@ ISR(TIMER1_OVF_vect){
 
 ISR(PCINT0_vect){ 
 	_delay_ms(10);
-	if (butpress)	{  
-		DDRB &=~ (1 << PB4);
+	if (butpress)	{    
+		duty = 250;
+		
+//		DDRB &=~ (1 << PB4);
 	}
-	else {  
-		DDRB |= (1 << PB4);
+	else {   
+		duty = 10;
 	}
 } 
 
