@@ -12,18 +12,36 @@ int main (void) {
 	init();
     	while (1)  
         { 	       
-		/*_delay_ms(10);
-		if (butpress){  
+		/*
+		_delay_ms(10);
+		if (but3){  
 			_delay_ms(10);
-			if (butpress){ 
-				DDRB &=~ (1 << PB4);
+			if (but3){  
+				duty = 250;
 			}
 		} 
-		else {  
-			DDRB |= (1 << PB4);
-		
+		else if (but2){      
+			_delay_ms(10);
+			if (but2){  
+			duty = 150; 
+			}
 		}
-*/
+		else if (but1){    
+			_delay_ms(10);
+			if (but1){  
+			duty = 60; 
+			}
+		}
+		else if (but0){    
+			_delay_ms(10);
+			if (but0){  
+			duty = 20; 
+			}
+		}
+		else {   
+			duty = 10;
+		} 
+		*/
     	}  
 
 
@@ -57,33 +75,29 @@ ISR(TIMER1_OVF_vect){
  
 
 ISR(PCINT0_vect){ 
+
 	_delay_ms(10); 
 	
 	if (but3){    
 		duty = 250;
 	}
-	else {   
-		duty = 10;
-	} 
-	if (but2){    
-		duty = 150;
+	
+	else if (but2){    
+		duty = 200;
 	}
+
+	else if (but1){    
+		duty = 130;
+	}
+
+	else if (but0){    
+		duty = 50;
+	}
+
 	else {   
 		duty = 10;
 	} 
 	
-	if (but1){    
-		duty = 60;
-	}
-	else {   
-		duty = 10;
-	}
-	if (but0)	{    
-		duty = 20;
-	}
-	else {   
-		duty = 10;
-	}
 	
 } 
 
