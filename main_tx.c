@@ -62,7 +62,7 @@ void init(){
 	GTCCR |= ((1 << COM1B1) | (1 << PWM1B));  //PB4 enabled for output of pwm
 	TIMSK |= (1 << TOIE1); 
 	sei(); 
-	TCCR1 |= (1 << CS10) ; //prescaler of 64 
+	TCCR1 |= (1 << CS12); //prescaler of 8, 488.28125Hz
 
 } 
 
