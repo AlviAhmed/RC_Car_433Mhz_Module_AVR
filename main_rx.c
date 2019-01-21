@@ -2,62 +2,69 @@
 #include <avr/io.h>
 #include <stdio.h>
 #include <util/delay.h>
-#include <avr/interrupt.h>   
-adcval = 0;
-int main (void) { 
-	init();
+#include <avr/interrupt.h>    
+#define starttime 
+#define endtime 
+#define count
+#define counter 
+#define butpress (PINB) & _BV(2)
+int tick_count = 0;
+int enable = 0; 
+
+int main (void) {  
+	init();  
+	OCR0A = 100;  //ctc mode will trigger at 0.1ms
     	while (1)  
-        { 	         
-		_delay_ms(15);
-		if (adcval >= 180){ 
-			PORTB = (PORTB & 0x0F) | 0x08;  //PB3, making sure only pin turned on and nothing else
+        { 	     
+		//_delay_us(2);
+//		TCCR0B &=~ (1 << CS00); //initially turn off the timer  
+		if (tick_count > 14  && tick_count <= 20){  //when tick_counter = 16.1, means 1.601 ms gone by
+			PORTB |= (1 << PB4); 
+//			 
+//			TCCR0B &=~ (1 << CS00); 
+			tick_count = 0;	
 		} 
-		else if (adcval > 145&& adcval <= 165){  
-			PORTB = (PORTB & 0x0F) | 0x04; //PB2
+	       	else { 
+			PORTB &=~ (1 << PB4); 
 		} 
-		else if (adcval > 95 && adcval <= 115){  
-			PORTB = (PORTB & 0x0F) | 0x02; //PB1
-
-		}
-		else if (adcval > 50 && adcval <= 65){  
-			PORTB = (PORTB & 0x0F) | 0x01; //PB0
-
-		} 
-		else {  
-
-			PORTB &=~  0x0F; //turning of all leds PB3 - PB0
-
-		}
     	}  
 
 
      } 
 
 
-void init(){  
-	DDRB &=~ (1<<PB4);  //setting PB4(ADC2) as input for the RX signal   
-	DDRB |= 0x0F;  //setting up leds
-	PORTB &=~ 0x0F; //initially turning all leds off
-	ADCinit();
+void init(){   
+	//button init
+	DDRB &=~ (1<<PB2);  //setting PB4(ADC2) as input for the RX signal    
+	//led init
+	DDRB |= (1 << PB4);  //setting up leds
+	PORTB &=~ (1 << PB4); //initially turning all leds off  
+
+	//INT0 init	
+	MCUCR |=/* (1 << ISC01) |*/ (1 << ISC00);//ISC01 & ISC00 both 1, triggers INT0 on rising edge 
+	GIMSK |= (1 << INT0);  
+
+	//CTC Mode init
+	TCCR0A |= (1 << WGM01); //CTC Mode, top OCRA 
+	TIMSK |= (1 << OCIE0A); //interrupt enable when TCNT == OCRA
+
 	sei();
 }   
 
+ISR(INT0_vect){    
+	if (butpress) { 
+		TCCR0B |= (1 << CS00); //turning on the timer, when pulse is high       
+//		PORTB |= (1 << PB4);
+	} 
+	else { 
+		TCCR0B &=~ (1 << CS00); 
+		tick_count = 0; 
+//		PORTB &=~ (1 << PB4);
+	}
+}  
 
-void ADCinit(){   
-	ADMUX &= ~ (1 << REFS1) | (1 << REFS0); //Vcc as reference, remeber to put decoupling capacitor in the aref pin
-	ADMUX |= (1<<ADLAR)|(1<<MUX1); //left shifting ADC reg, enabling ADC2 (PB4) for input adc
-	ADCSRA |= (1<<ADEN)|(1<<ADATE)|(1<<ADIE)|(1<<ADSC)|(1<<ADPS1)|(1<<ADPS0);//adc enable, auto trigger, enable interrupt 
-	ADCSRB &=~ (1 << ADTS2) | (1 << ADTS1) | (1 << ADTS0);
-	//prescaler of 8, thus with 1Mhz clock -> 125 kHz clock
-	startconvo();
-} 
-
-void startconvo(){ 
-ADCSRA |= (1<<ADSC); //used to initialize convo
+ISR ( TIMER0_COMPA_vect){  
+//	PORTB ^= (1 << PB4); //toggling led to test CTC
+	tick_count ++; //amount of times 0.1ms has passed
 }
 
-ISR(ADC_vect){  
-	adcval = ADCH;//updating value of adcval
-
-}
- 
