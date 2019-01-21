@@ -1,1 +1,16 @@
+This is an attempt to create an RC car by myself, using some 433Mhz modules, 2 attiny 85 microcontrollers, a couple of H-bridges and motors. 
 
+I am planning on making this a tank like car, therefore will turn and move like a tank. 
+
+More details and plans on this project will be revealed after some time, since this is a step by step process. 
+
+My first hurdle is establishing communication between 2 attiny 85, at first I used ADC to interpret the PWM signal from another attiny85, that didn't work so I moved on to using hardwire interrupts and timing the high signal of the PWM. 
+
+Using the hardware interrupt method, I had my first success when I was able to make the attiny differentiate between a duty cycle of 200 among other duty cycles and be able to light up a corresponding LED. 
+
+However this will need much more work. 
+
+To be continued ...... 
+
+
+All files in the repository are licensed under CC BY-NC-SA 4.0
