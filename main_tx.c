@@ -12,58 +12,21 @@ int main (void) {
 	init();
     	while (1)  
         { 	       
-		/*
-		_delay_ms(10);
-		if (but3){  
-			_delay_ms(10);
-			if (but3){  
-				duty = 250;
-			}
-		} 
-		else if (but2){      
-			_delay_ms(10);
-			if (but2){  
-			duty = 150; 
-			}
-		}
-		else if (but1){    
-			_delay_ms(10);
-			if (but1){  
-			duty = 60; 
-			}
-		}
-		else if (but0){    
-			_delay_ms(10);
-			if (but0){  
-			duty = 20; 
-			}
-		}
-		else {   
-			duty = 10;
-		} 
-		*/
-    	}  
 
 
-     } 
+     	} 
 
-
+}
 void init(){  
 	DDRB |= (1 << PB4);     
-
 	DDRB &= ~ (1 << PB3) | (1 << PB2) | (1 << PB1) | (1 << PB0);  
-
 	PORTB |= (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1) | (1 << PB0);    
-
 	GIMSK |= (1 << PCIE); 
-
 	PCMSK |= (1 << PCINT3) | (1 << PCINT2) |(1 << PCINT1) | (1 << PCINT0);
-
 	GTCCR |= ((1 << COM1B1) | (1 << PWM1B));  //PB4 enabled for output of pwm
 	TIMSK |= (1 << TOIE1); 
 	sei(); 
-	TCCR1 |= (1 << CS12); //prescaler of 8, 488.28125Hz
-
+	TCCR1 |= ((1 << CS12) | (1 << CS11) | (1 << CS10)); //prescaler of 64, 61.0352 Hz
 } 
 
 

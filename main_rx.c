@@ -25,27 +25,27 @@ int main (void) {
 		_delay_ms(5);
 		if (~butpress){ 
 			//State 4 FWD
-			if (tick_count > 14 && tick_count <= 18){  //when tick_counter = 16.1, means 1.601 ms gone by 
+			if (tick_count > 118 && tick_count <= 140){  //when tick_counter = 16.1, means 1.601 ms gone by 
 			//	PORTB = PORTB & (0x00) | (0x10); //turning off all leds other than PB4  
 				PORTB = PORTB & (0x00) | (0x12);//just PB4 & PB1 
 			}   
 			//State 3 RIGHT
-			else if (tick_count > 10 && tick_count <= 13){ //tick counter = 12.04 
+			else if (tick_count > 86 && tick_count <= 106){ //tick counter = 12.04 
 				//PORTB = PORTB & (0x00) | (0x08); // //   ///               //     PB3 
 				  PORTB = PORTB & (0x00) | (0x11);//PB3 & PB0
 			}  
 			//State 2 LEFT
-			else if (tick_count > 6 && tick_count <= 10){ //tick counter = 8.0314
+			else if (tick_count > 54 && tick_count <= 74){ //tick counter = 8.0314
 				//PORTB = PORTB & (0x00) | (0x02); // //   ///               //     PB1 
 				PORTB = PORTB & (0x00) | (0x0A);//PB3 & PB1
 			} 
 			//State 1 REV
-			else if (tick_count > 2 && tick_count <= 6){ //tick counter = 4.0
+			else if (tick_count > 22 && tick_count <= 42){ //tick counter = 4.0
 				//PORTB = PORTB & (0x00) | (0x01); // //   ///               //     PB0 
 				PORTB = PORTB & (0x00) | (0x09);//PB0 & PB4
 			} 
 			//State 0 OFF
-			else if (tick_count <= 1) { //tick counter = 0.8 (default signal)
+			else if (tick_count <= 7) { //tick counter = 0.8 (default signal)
 				PORTB &=~ (0x1B);  //turn of all bits
 			}     
 		}
