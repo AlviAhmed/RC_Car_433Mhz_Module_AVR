@@ -12,8 +12,6 @@ int tick_count = 0;
 int enable = 0;   
 int state = 0; 
 
-//Either something wrong with defining ports 
-
 int main (void) {  
 	init();  
 	OCR0A = 100;  //ctc mode will trigger at 0.1ms

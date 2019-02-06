@@ -57,7 +57,7 @@ ISR(PCINT0_vect){
 	}
 
 	else {   
-		duty = 30;//0.141 on rx
+		duty = 30;
 	} 
 	
 	
