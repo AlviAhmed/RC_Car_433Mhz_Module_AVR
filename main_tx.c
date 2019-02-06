@@ -38,14 +38,14 @@ ISR(TIMER1_OVF_vect){
 
 ISR(PCINT0_vect){ 
 
-	_delay_ms(10); 
+	_delay_ms(5); 
 //button number corresponds with pin	
 	if (but3){    
-		duty = 200; //2.924 on rx
+		duty = 150; //2.924 on rx
 	}
 	
 	else if (but2){    
-		duty = 150;//2.183 on rx
+		duty = 130;//2.183 on rx
 	}
 
 	else if (but1){    
@@ -57,7 +57,7 @@ ISR(PCINT0_vect){
 	}
 
 	else {   
-		duty = 10;//0.141 on rx
+		duty = 30;//0.141 on rx
 	} 
 	
 	
