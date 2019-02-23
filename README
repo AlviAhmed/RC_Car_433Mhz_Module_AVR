@@ -18,5 +18,6 @@ If the code side is the issue then my plan will be to find a different mode of c
 Instead it would be better to have some other communication protocols/encoding systems like SPI, USART, UART, ICP,  
 Manchester Encoding, etc and see how they fair in wireless communication. 
 
+Hackaday: https://hackaday.io/project/163719-rc-car
 
 All files in the repository are licensed under CC BY-NC-SA 4.0
