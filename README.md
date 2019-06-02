@@ -1,3 +1,5 @@
+# RC_tiny85
+
 This is an attempt to create an RC car using some 433Mhz modules, 2 attiny 85 microcontrollers, a couple of H-bridges and motors. 
 
 I am planning on making this a tank like car, therefore will turn and move like a tank.  
