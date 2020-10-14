@@ -1,0 +1,44 @@
+#+LaTeX_CLASS: mycustom 
+
+#+TITLE: RC Car With 433Mhz and AVR
+#+AUTHOR: Alvi Ahmed
+
+*Status:* Ongoing
+*Type:* Personal  
+
+
+* Objective  
+
+To create a RC car using 433Mhz modules and 2 atmega328p
+microcontrollers.  
+
+
+* Logs  
+
+** USART   
+
+I am now working on USART communcation. I have noticed that it indeed
+works much better and the previous PWM and duty cycle method, however
+through wireless it is still a bit unreliable. Therefore, with USART I
+need to send multiple bytes for syncing, reciever checking, error
+checking and the byte for the actual command. All easier to do on
+USART the previous method.
+
+** PWM and varying Duty Cycles
+A couple of methods have been experimented with, I initially tried to
+transmit varying dutying cycles of pwm to the reciever. The different
+duty cycles representing the various directions and functions of the
+RC car. 
+
+This plan had a lot of flaws, first of all it a only worked well when
+directly connected to the car via wire. However, once wireless the
+function of the car was very laggy for some inputs and a bit jittery. 
+
+Also, since this was wireless, small changes in duty cycle may not
+register on the recieving end, thus need to make large changes to the
+duty cycles, thus limiting my options for the amount of commands /
+instructions I can transmit.
+
+Leading me to conclude that a more complex system of communication
+needed to be used, where synchronousation can be confirmed / ensured
+and multiple bytes can be sent. i.e. USART, Manchester Encoding and etc.
