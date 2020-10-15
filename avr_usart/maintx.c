@@ -26,19 +26,22 @@
 #define but0 (~PINB) & (1 << PB2) // PCINT2
 
 #define syncByte 0xAA
-#define recieverByte1 0x0C
-#define recieverByte2 0x09
+#define rxSerialNum1 0x0C
+#define rxSerialNum2 0x0C
 
 
 volatile int pressed = 0;
 volatile char ar = 'n';
+volatile uint8_t txByte = 0x00;
 uint8_t i = 0;
 int enable = 1;
 
-void txPacket(uint8_t txByte){
-    
-    
+void txPacket(uint8_t rxbyte, uint8_t command){
+    txByte = syncByte;
+    txByte = rxbyte;
+    txByte = command;
 }
+
 
 int main(void){
 
@@ -69,27 +72,42 @@ int main(void){
 ISR(PCINT0_vect){
     _delay_ms(5); 
     if (but3){
-        ar = '3';
+        txPacket(rxSerialNum1,0x04);
+        // txByte = syncByte;
+        // txByte = 0x04;
+        // ar = '3';
         PORTB |= (1 << PB1);
     }
         
     else if (but2){    
-        ar = '2';
+        txPacket(rxSerialNum1,0x03);
+        // txByte = syncByte; 
+        // txByte = 0x03;
+        // ar = '2';
         PORTB |= (1 << PB1);
     }
         
-    else if (but1){    
-        ar = '1';
+    else if (but1){
+        txPacket(rxSerialNum1,0x02);
+        // txByte = syncByte; 
+        // txByte = 0x02;
+       // ar = '1';
         PORTB |= (1 << PB1);
     }
         
     else if (but0){    
-        ar = '0';
+        txPacket(rxSerialNum1,0x01);
+        // txByte = syncByte; 
+        // txByte = 0x01;
+        // ar = '0';
         PORTB |= (1 << PB1);
     }
         
     else {   
-        ar = 'n';
+        txPacket(rxSerialNum1,0x05);
+        // txByte = syncByte; 
+        // txByte = 0x05;
+        // ar = 'n';
         PORTB &=~ (1 << PB1);
     }       
 
@@ -98,14 +116,6 @@ ISR(PCINT0_vect){
 ISR(USART_TX_vect)
 {
     // UDR0 = ar;
+    UDR0 = txByte;
 }
 
-/* 
-   for (i = 0; i < strlen(ar) ; i++){ 
-   UDR0 = ar[i]; 
-   } 
-   if(UCSR0A & (1 << UDRE0))
-   {
-   UDR0 = 0;
-   }
-*/

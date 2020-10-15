@@ -1,6 +1,6 @@
 DEVICE     = atmega328p
 CLOCK      = 16000000  
-PROGRAMMER = -c arduino -b 115200 -P /dev/ttyUSB1
+PROGRAMMER = -c arduino -b 115200 -P /dev/ttyUSB3
 OBJECTS    = mainrx.c
 FUSES      = -U lfuse:w:0xff:m -U hfuse:w:0xd9:m -U efuse:w:0xff:m  
 

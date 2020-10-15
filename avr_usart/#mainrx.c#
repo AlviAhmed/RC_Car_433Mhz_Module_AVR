@@ -38,10 +38,12 @@ int main(void){
     DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1);
     PORTB &= ~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2);
     PORTB |= (1 << PB1);
+    
     //High and low bits
     UBRR0H = (ubbrn >> 8); 
     UBRR0L = ubbrn; 
     ////////////////
+
     uint8_t addr = 0x00;
     //transimit and recieve enable
     UCSR0B =  (1 << RXEN0) | (1 << RXCIE0);
