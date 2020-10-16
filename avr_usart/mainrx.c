@@ -52,19 +52,19 @@ int main(void){
     UDR0 = 0;
     while (1){
             addr = rxByte;
-            if (addr == 0x04)
+            if (addr == (0x04 + rxSerialNum1))
             { 
                 PORTB |= (1 << PB5);
             }
-            else if (addr == 0x03)
+            else if (addr == (0x03 + rxSerialNum1))
             {
                 PORTB |= (1 << PB4);
             }
-            else if (addr == 0x02)
+            else if (addr == (0x02 + rxSerialNum1))
             {
                 PORTB |=  (1 << PB3);
             }
-            else if (addr == 0x01)
+            else if (addr == (0x01 + rxSerialNum1))
             {
                 PORTB |= (1 << PB2);
             }
