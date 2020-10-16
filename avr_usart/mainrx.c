@@ -51,8 +51,6 @@ int main(void){
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
     while (1){
-
-        if (rxByte == rxSerialNum1){
             addr = rxByte;
             if (addr == 0x04)
             { 
@@ -76,7 +74,6 @@ int main(void){
                 PORTB &=~ (1 << PB3);
                 PORTB &=~ (1 << PB2);
             }
-        }
         }
 }  
 

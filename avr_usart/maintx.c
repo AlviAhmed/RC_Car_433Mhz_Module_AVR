@@ -72,41 +72,41 @@ int main(void){
 ISR(PCINT0_vect){
     _delay_ms(5); 
     if (but3){
-        txPacket(rxSerialNum1,0x04);
+        // txPacket(rxSerialNum1,0x04);
         // txByte = syncByte;
-        // txByte = 0x04;
+        txByte = 0x04;
         // ar = '3';
         PORTB |= (1 << PB1);
     }
         
     else if (but2){    
-        txPacket(rxSerialNum1,0x03);
+        // txPacket(rxSerialNum1,0x03);
         // txByte = syncByte; 
-        // txByte = 0x03;
+        txByte = 0x03;
         // ar = '2';
         PORTB |= (1 << PB1);
     }
         
     else if (but1){
-        txPacket(rxSerialNum1,0x02);
+        // txPacket(rxSerialNum1,0x02);
         // txByte = syncByte; 
-        // txByte = 0x02;
+        txByte = 0x02;
        // ar = '1';
         PORTB |= (1 << PB1);
     }
         
     else if (but0){    
-        txPacket(rxSerialNum1,0x01);
+        // txPacket(rxSerialNum1,0x01);
         // txByte = syncByte; 
-        // txByte = 0x01;
+        txByte = 0x01;
         // ar = '0';
         PORTB |= (1 << PB1);
     }
         
     else {   
-        txPacket(rxSerialNum1,0x05);
+        // txPacket(rxSerialNum1,0x05);
         // txByte = syncByte; 
-        // txByte = 0x05;
+        txByte = 0x05;
         // ar = 'n';
         PORTB &=~ (1 << PB1);
     }       
