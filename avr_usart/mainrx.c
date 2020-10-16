@@ -21,11 +21,11 @@
 #define buffer_size 128
 
 #define syncByte 0xAA
-#define rxSerialNum1 0x0C
 
 char rxbuffer[buffer_size];
 uint8_t rxreadpos = 0;
 uint8_t rxwritepos = 0;
+uint8_t rxSerialNum1 = 0x1F;
 
 char ar[128]= " hello ";
 uint8_t i = 0;
