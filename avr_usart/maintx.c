@@ -24,6 +24,7 @@
 #define but2 (~PINB) & (1 << PB4) // PCINT4
 #define but1 (~PINB) & (1 << PB3) // PCINT3
 #define but0 (~PINB) & (1 << PB2) // PCINT2
+#define butTog (~PINB) & (1 << PB0) // PCINT0
 
 #define syncByte 0xAA
 
@@ -34,9 +35,10 @@ volatile uint8_t txByte = 0x00;
 volatile uint8_t rxSerNum = 0x0C;
 uint8_t i = 0;
 int enable = 1;
-int tx_bool = 0;
+volatile int ser_bool = 0;
 uint8_t num1 = 0x0C;
 uint8_t num2 = 0xAA;
+
 
 
 void txPacket(uint8_t rxbyte, uint8_t command){
@@ -51,6 +53,8 @@ int main(void){
     DDRB |= (1 << PB1);
     PORTB &=~ (1 << PB1);
 
+    // DDRB &=~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB0);
+    // PORTB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB0);
     //High and low bits
     UBRR0H = (ubbrn >> 8); 
     UBRR0L = ubbrn; 
@@ -63,11 +67,17 @@ int main(void){
     UDR0 = 0;
     
 // Pin interrupt config
-    PCMSK0 |= (1 << PCINT5) | (1 << PCINT4) | (1 << PCINT3) | (1 << PCINT2);
+    PCMSK0 |= (1 << PCINT5) | (1 << PCINT4) | (1 << PCINT3) | (1 << PCINT2) | (1 << PCINT0);
     PCICR |= ( 1 << PCIE0 );
     sei();
     
     while (1){
+        if (ser_bool == 0){
+            rxSerNum = num1;
+        }
+        else if (ser_bool == 1){
+            rxSerNum = num2;
+        }
     }
 }  
 
@@ -104,6 +114,10 @@ ISR(PCINT0_vect){
         // txByte = syncByte; 
         txByte = 0x01 + rxSerNum;
         // ar = '0';
+        PORTB |= (1 << PB1);
+    }
+    else if (butTog){
+        ser_bool = !ser_bool;
         PORTB |= (1 << PB1);
     }
         
