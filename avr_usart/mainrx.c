@@ -26,12 +26,16 @@ char rxbuffer[buffer_size];
 uint8_t rxreadpos = 0;
 uint8_t rxwritepos = 0;
 uint8_t rxSerialNum1 = 0x1F;
-
+uint8_t serialByte = 0x1F;
 char ar[128]= " hello ";
 uint8_t i = 0;
 int enable = 1;
 char c = '\0';
 
+uint8_t recieveByte(){
+    while( ((UCSR0A & (1<<RXC0)) == 0) && (UDR0 == 0x00) );
+  return UDR0;
+}
 volatile uint8_t rxByte = 0x00;
 
 int main(void){
