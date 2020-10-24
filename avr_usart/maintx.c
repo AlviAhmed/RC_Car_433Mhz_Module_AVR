@@ -26,21 +26,15 @@
 #define but0 (~PINB) & (1 << PB2) // PCINT2
 #define butTog (~PINB) & (1 << PB1) // PCINT0
 
-#define bufferSize 2
-
-/* #define but3 (~PIND) & (1 << PD4) // PCINT20 */
-/* #define but2 (~PIND) & (1 << PD5) // PCINT21 */
-/* #define but1 (~PIND) & (1 << PD6) // PCINT22 */
-/* #define but0 (~PIND) & (1 << PD3) // PCINT19 */
-/* #define butTog (~PINB) & (1 << PB0) // PCINT0 */
-
-
+#define bufferSize 3
 
 volatile int pressed = 0;
 volatile char ar = 'n';
+
 /* volatile uint8_t txByte = 0x00; */
 /* volatile uint8_t rxSerNum = 0x0C; */
 /* volatile uint8_t syncByte = 0xAA; */
+
 volatile char syncByte = 's';
 volatile char num2 = '2';
 volatile char txByte = '0';
@@ -74,10 +68,24 @@ int tx_clear = 1;
 
 /* } */
 
+
+/* void appendTx(uint8_t data_byte) */
+/* { */
+/*     txBuffer[txWritePos] = data_byte; */
+/*     txWritePos++; //increment global write position as you are inputting things into the array */
+/*     if (txWritePos >= bufferSize){ */
+/*         txWritePos  = 0; */
+/*     } */
+/* } */
+
 void txPacket(char rxbyte, char command){
-    /* txBuffer[0] = syncByte; */
-    txBuffer[0] = rxbyte;
-    txBuffer[1] = command;
+    /* appendTx(syncByte); */
+    /* appendTx(rxbyte); */
+    /* appendTx(command); */
+    txBuffer[0] = syncByte;
+    txBuffer[1] = rxbyte;
+    txBuffer[2] = command;
+
 }
 
 
@@ -169,9 +177,12 @@ ISR(PCINT0_vect){
 
 ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
 {
-    for(i = 0; i < bufferSize; i++){
-        /* UDR0 = i; */
-        UDR0 = txBuffer[i];
-        /* printf("%d",i); */
+
+    if (txReadPos != 3){ //now we are reading the info from the buffer index by index to be transmitted
+        UDR0 = txBuffer[txReadPos]; //tx read pos just used to index the buffer data to be transmitted
+        txReadPos ++;
+        if (txReadPos >= bufferSize){
+            txReadPos = 0;
+        }
     }
 }
