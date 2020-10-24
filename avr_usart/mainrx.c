@@ -20,25 +20,24 @@
 #define ubbrn ((F_CPU/16/BAUD) - 1)
 #define buffer_size 128
 
-#define syncByte 0xAA
+#define bufferSize 3
 
-char rxbuffer[buffer_size];
-uint8_t rxreadpos = 0;
-uint8_t rxwritepos = 0;
-uint8_t num2 = 0x1F;
+volatile char syncByte = 's';
+volatile char rxSerNum = '1';
 
-char ar[128]= " hello ";
-uint8_t i = 0;
-int enable = 1;
-char c = '\0';
+char rxBuffer[bufferSize];
+char rxWritePos = 0;
+char rxReadPos = 0;
 
-volatile uint8_t rxByte = 0x00;
+void appendRx(uint8_t data_byte) //UDR0 will be the input of the function
+{
+    rxBuffer[rxWritePos] = data_byte;
+    rxWritePos++; //increment global write position as you are inputting things into the array
 
-/* void recieving_Byte(){ */
-/*     while(UCSR0A && (1 << RXC0)) */
-
-/*         } */
-
+    if (rxWritePos >= bufferSize){
+        rxWritePos  = 0;
+    }
+}
 
 int main(void){
     DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1);
@@ -51,65 +50,60 @@ int main(void){
     uint8_t addr = 0x00;
     //transimit and recieve enable
     UCSR0B =  (1 << RXEN0) | (1 << RXCIE0);
+    /* | (1 << TXEN0) | (1 << TXCIE0); */
     // UCSR0B = (1 << RXEN0) | (1 << RXCIE0);
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  //8 bit data format
     sei();
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
     while (1){
-        /* char user_input = '0'; */
-        /* user_input = rxByte; */
-        /* switch (user_input){ */
-        /*     case ('1'): */
-        /*         PORTB |= (1 << PB5); */
-        /*         break; */
-        /*     case('2'): */
-        /*         PORTB |= (1 << PB4); */
-        /*         break; */
-        /*     case('3'): */
-        /*         PORTB |=  (1 << PB3); */
-        /*         break; */
-        /*     case('4'): */
-        /*         PORTB |=  (1 << PB2); */
-        /*         break; */
-        /*     default: */
-        /*         PORTB &=~ (1 << PB5); */
-        /*         PORTB &=~ (1 << PB4); */
-        /*         PORTB &=~ (1 << PB3); */
-        /*         PORTB &=~ (1 << PB2); */
-        /*         break; */
-        /* } */
-        /* if (rxByte == num2){ */
-            if (rxByte == (0x04))
-            {
-                PORTB |= (1 << PB5);
+        char cmd = '0';
+        char ser = '0';
+        ser = rxBuffer[1];
+        cmd = rxBuffer[2];
+        if (ser == '1'){
+             switch (cmd){
+                case ('f'):
+                    PORTB |= (1 << PB5);
+                    break;
+                case('b'):
+                    PORTB |= (1 << PB4);
+                    break;
+                case('r'):
+                    PORTB |=  (1 << PB3);
+                    break;
+                case('l'):
+                    PORTB |=  (1 << PB2);
+                    break;
+                default:
+                    PORTB &=~ (1 << PB5);
+                    PORTB &=~ (1 << PB4);
+                    PORTB &=~ (1 << PB3);
+                    PORTB &=~ (1 << PB2);
+                    break;
             }
-            else if (rxByte == (0x03))
-            {
-                PORTB |= (1 << PB4);
-            }
-            else if (rxByte == (0x02))
-            {
-                PORTB |=  (1 << PB3);
-            }
-            else if (rxByte == (0x01))
-            {
-                PORTB |= (1 << PB2);
-            }
-            else if (rxByte == 0x05){
+        }
+        else{
                 PORTB &=~ (1 << PB5);
                 PORTB &=~ (1 << PB4);
                 PORTB &=~ (1 << PB3);
                 PORTB &=~ (1 << PB2);
-            }
-        /* } */
-    }
+        }
+        }
 
     return 0;
 }  
 
 ISR(USART_RX_vect)
 {
-    rxByte = UDR0;
-}
+    if (rxReadPos != 3){ //now we are reading the info from the buffer index by index to be transmitted
+        rxBuffer[rxReadPos] = UDR0; //tx read pos just used to index the buffer data to be transmitted
+        /* UDR0 = rxBuffer[rxReadPos]; //tx read pos just used to index the buffer data to be transmitted */
+        rxReadPos ++;
+        if (rxReadPos >= bufferSize){
+            rxReadPos = 0;
+        }
+    }
 
+
+}

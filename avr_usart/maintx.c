@@ -36,7 +36,9 @@ volatile char ar = 'n';
 /* volatile uint8_t syncByte = 0xAA; */
 
 volatile char syncByte = 's';
+volatile char rxSerNum = '0';
 volatile char num2 = '2';
+volatile char num1 = '1';
 volatile char txByte = '0';
 
 
@@ -51,7 +53,7 @@ volatile int i = 0;
 
 int enable = 1;
 volatile int ser_bool = 0;
-uint8_t num1 = 0x0C;
+
 /* uint8_t num2 = 0x1F; */
 
 int tx_clear = 1;
@@ -117,12 +119,12 @@ int main(void){
     
     while (1){
         if (ser_bool == 0){
-            /* rxSerNum = num1; */
+            rxSerNum = num1;
             PORTD |= (1 << PD2);
             PORTD &=~ (1 << PD3);
         }
         else if (ser_bool == 1){
-            /* rxSerNum = num2; */
+            rxSerNum = num2;
             PORTD &=~ (1 << PD2);
             PORTD |= (1 << PD3);
         }
@@ -136,13 +138,13 @@ ISR(PCINT0_vect){
     if (but3){
         /* txByte = syncByte; */
         /* txByte = 0x04; */
-        txPacket(num2, 'f');
+        txPacket(rxSerNum, 'f');
         PORTB |= (1 << PB0);
     }
     else if (but2){
         /* txByte = syncByte; */
         /* txByte = 0x03; */
-        txPacket(num2, 'b');
+        txPacket(rxSerNum, 'b');
         /* ar = '2'; */
         PORTB |= (1 << PB0);
     }
@@ -150,12 +152,12 @@ ISR(PCINT0_vect){
     else if (but1){
         /* txByte = syncByte; */
         /* txByte = 0x02; */
-        txPacket(num2, 'r');
+        txPacket(rxSerNum, 'r');
        /* ar = '1'; */
         PORTB |= (1 << PB0);
     }
     else if (but0){
-        txPacket(num2, 'l');
+        txPacket(rxSerNum, 'l');
         /* txByte = syncByte; */
         /* txByte = 0x01; */
         /* ar = '0'; */
@@ -166,7 +168,7 @@ ISR(PCINT0_vect){
         PORTB |= (1 << PB0);
     }
     else {
-        txPacket(num2, 'n');
+        txPacket(rxSerNum, 'n');
         /* txByte = syncByte; */
         /* txByte = 0x05; */
         PORTB &=~ (1 << PB0);
@@ -177,7 +179,6 @@ ISR(PCINT0_vect){
 
 ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
 {
-
     if (txReadPos != 3){ //now we are reading the info from the buffer index by index to be transmitted
         UDR0 = txBuffer[txReadPos]; //tx read pos just used to index the buffer data to be transmitted
         txReadPos ++;
