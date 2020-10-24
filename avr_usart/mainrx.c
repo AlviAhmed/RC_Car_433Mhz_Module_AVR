@@ -34,6 +34,12 @@ char c = '\0';
 
 volatile uint8_t rxByte = 0x00;
 
+/* void recieving_Byte(){ */
+/*     while(UCSR0A && (1 << RXC0)) */
+
+/*         } */
+
+
 int main(void){
     DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1);
     PORTB &= ~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2);
@@ -51,8 +57,8 @@ int main(void){
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
     while (1){
-        char user_input = '0';
-        user_input = rxByte;
+        /* char user_input = '0'; */
+        /* user_input = rxByte; */
         /* switch (user_input){ */
         /*     case ('1'): */
         /*         PORTB |= (1 << PB5); */
@@ -73,6 +79,7 @@ int main(void){
         /*         PORTB &=~ (1 << PB2); */
         /*         break; */
         /* } */
+        /* if (rxByte == num2){ */
             if (rxByte == (0x04))
             {
                 PORTB |= (1 << PB5);
@@ -95,7 +102,10 @@ int main(void){
                 PORTB &=~ (1 << PB3);
                 PORTB &=~ (1 << PB2);
             }
-        }
+        /* } */
+    }
+
+    return 0;
 }  
 
 ISR(USART_RX_vect)

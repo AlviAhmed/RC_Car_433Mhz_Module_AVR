@@ -26,6 +26,8 @@
 #define but0 (~PINB) & (1 << PB2) // PCINT2
 #define butTog (~PINB) & (1 << PB1) // PCINT0
 
+#define bufferSize 3
+
 /* #define but3 (~PIND) & (1 << PD4) // PCINT20 */
 /* #define but2 (~PIND) & (1 << PD5) // PCINT21 */
 /* #define but1 (~PIND) & (1 << PD6) // PCINT22 */
@@ -34,25 +36,62 @@
 
 
 
-#define syncByte 0xAA
-
 volatile int pressed = 0;
 volatile char ar = 'n';
-volatile uint8_t txByte = 0x00;
-volatile uint8_t rxSerNum = 0x0C;
+/* volatile uint8_t txByte = 0x00; */
+/* volatile uint8_t rxSerNum = 0x0C; */
+/* volatile uint8_t syncByte = 0xAA; */
+volatile char syncByte = 's';
+volatile char num2 = '2';
+volatile char txByte = '0';
+
+
+
+char txBuffer[bufferSize];
+char txWritePos = 0;
+char txReadPos = 0;
+
+
 
 uint8_t i = 0;
 int enable = 1;
 volatile int ser_bool = 0;
 uint8_t num1 = 0x0C;
-uint8_t num2 = 0x1F;
+/* uint8_t num2 = 0x1F; */
+
+int tx_clear = 1;
 
 
+void nullByteIfEmpty(){
+    if (UCSR0A & (1 << UDRE0)) { //if the UDRE register is empty, then send a null byte, just to make sure no junk is put in to the register
+        UDR0 = 0x00;
+     }
+}
 
-void txPacket(uint8_t rxbyte, uint8_t command){
-    txByte = syncByte;
-    txByte = rxbyte;
-    txByte = command;
+void sendInfo(char info){
+         UDR0 = info;
+
+}
+
+/* void appendTx(char rxbyte, char command) */
+/* { */
+/*     /\* txBuffer[txWritePos] = data_byte; *\/ */
+/*     /\* txWritePos++; //increment global write position as you are inputting things into the array *\/ */
+
+/*     /\* if (txWritePos >= bufferSize){ *\/ */
+/*     /\*     txWritePos  = 0; *\/ */
+/*     /\* } *\/ */
+/* } */
+
+
+void txPacket(char rxbyte, char command){
+    txBuffer[0] = syncByte;
+    txBuffer[1] = rxbyte;
+    txBuffer[2] = command;
+    /* sendInfo(syncByte); */
+    /* sendInfo(rxbyte); */
+    /* sendInfo(command); */
+    /* nullByteIfEmpty(); */
 }
 
 
@@ -84,12 +123,12 @@ int main(void){
     
     while (1){
         if (ser_bool == 0){
-            rxSerNum = num1;
+            /* rxSerNum = num1; */
             PORTD |= (1 << PD2);
             PORTD &=~ (1 << PD3);
         }
         else if (ser_bool == 1){
-            rxSerNum = num2;
+            /* rxSerNum = num2; */
             PORTD &=~ (1 << PD2);
             PORTD |= (1 << PD3);
         }
@@ -100,27 +139,35 @@ int main(void){
 
 ISR(PCINT0_vect){
     _delay_ms(5);
+    if (tx_clear == 0){
+        tx_clear = 1;
+    }
+
     if (but3){
-        txByte = syncByte;
-        txByte = 0x04;
+        /* txByte = syncByte; */
+        /* txByte = 0x04; */
+        txPacket(num2, 'f');
         PORTB |= (1 << PB0);
     }
     else if (but2){
-        txByte = syncByte;
-        txByte = 0x03;
+        /* txByte = syncByte; */
+        /* txByte = 0x03; */
+        txPacket(num2, 'b');
         /* ar = '2'; */
         PORTB |= (1 << PB0);
     }
         
     else if (but1){
-        txByte = syncByte;
-        txByte = 0x02 ;
+        /* txByte = syncByte; */
+        /* txByte = 0x02; */
+        txPacket(num2, 'r');
        /* ar = '1'; */
         PORTB |= (1 << PB0);
     }
     else if (but0){
-        txByte = syncByte;
-        txByte = 0x01;
+        txPacket(num2, 'l');
+        /* txByte = syncByte; */
+        /* txByte = 0x01; */
         /* ar = '0'; */
         PORTB |= (1 << PB0);
     }
@@ -129,14 +176,23 @@ ISR(PCINT0_vect){
         PORTB |= (1 << PB0);
     }
     else {
-        txByte = syncByte;
-        txByte = 0x05;
+        txPacket(num2, 'n');
+        /* txByte = syncByte; */
+        /* txByte = 0x05; */
         PORTB &=~ (1 << PB0);
+        /* tx_clear = 1; */
     }
 
 }
 
-ISR(USART_TX_vect)
+ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
 {
-    UDR0 = txByte;
+    /* UDR0 = txByte; */
+    if (tx_clear == 1){
+        /* UDR0 = txByte; */
+        tx_clear = 0;
+    }
+    else{
+        tx_clear = 1;
+    }
 }
