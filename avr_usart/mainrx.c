@@ -25,7 +25,7 @@
 char rxbuffer[buffer_size];
 uint8_t rxreadpos = 0;
 uint8_t rxwritepos = 0;
-uint8_t rxSerialNum1 = 0x1F;
+uint8_t num2 = 0x1F;
 
 char ar[128]= " hello ";
 uint8_t i = 0;
@@ -51,24 +51,45 @@ int main(void){
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
     while (1){
-            addr = rxByte;
-            if (addr == (0x04 + rxSerialNum1))
-            { 
+        char user_input = '0';
+        user_input = rxByte;
+        /* switch (user_input){ */
+        /*     case ('1'): */
+        /*         PORTB |= (1 << PB5); */
+        /*         break; */
+        /*     case('2'): */
+        /*         PORTB |= (1 << PB4); */
+        /*         break; */
+        /*     case('3'): */
+        /*         PORTB |=  (1 << PB3); */
+        /*         break; */
+        /*     case('4'): */
+        /*         PORTB |=  (1 << PB2); */
+        /*         break; */
+        /*     default: */
+        /*         PORTB &=~ (1 << PB5); */
+        /*         PORTB &=~ (1 << PB4); */
+        /*         PORTB &=~ (1 << PB3); */
+        /*         PORTB &=~ (1 << PB2); */
+        /*         break; */
+        /* } */
+            if (rxByte == (0x04))
+            {
                 PORTB |= (1 << PB5);
             }
-            else if (addr == (0x03 + rxSerialNum1))
+            else if (rxByte == (0x03))
             {
                 PORTB |= (1 << PB4);
             }
-            else if (addr == (0x02 + rxSerialNum1))
+            else if (rxByte == (0x02))
             {
                 PORTB |=  (1 << PB3);
             }
-            else if (addr == (0x01 + rxSerialNum1))
+            else if (rxByte == (0x01))
             {
                 PORTB |= (1 << PB2);
             }
-            else if (addr == 0x05){ 
+            else if (rxByte == 0x05){
                 PORTB &=~ (1 << PB5);
                 PORTB &=~ (1 << PB4);
                 PORTB &=~ (1 << PB3);
