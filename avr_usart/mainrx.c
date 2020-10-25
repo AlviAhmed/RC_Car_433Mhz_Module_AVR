@@ -22,12 +22,12 @@
 
 #define bufferSize 3
 
-volatile char syncByte = 's';
-volatile char rxSerNum = '1';
 
-char rxBuffer[bufferSize];
-char rxWritePos = 0;
-char rxReadPos = 0;
+volatile uint8_t rxBuffer[bufferSize];
+volatile int  rxWritePos = 0;
+volatile int  rxReadPos = 0;
+
+/* volatile uint8_t rxSerNum = 0x0C; */
 
 void appendRx(uint8_t data_byte) //UDR0 will be the input of the function
 {
@@ -41,8 +41,8 @@ void appendRx(uint8_t data_byte) //UDR0 will be the input of the function
 
 int main(void){
     DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1);
-    PORTB &= ~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2);
-    PORTB |= (1 << PB1);
+    PORTB &= ~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | ( 1 << PB1 );
+    /* PORTB |= (1 << PB1); */
     //High and low bits
     UBRR0H = (ubbrn >> 8); 
     UBRR0L = ubbrn; 
@@ -50,33 +50,31 @@ int main(void){
     uint8_t addr = 0x00;
     //transimit and recieve enable
     UCSR0B =  (1 << RXEN0) | (1 << RXCIE0);
-    /* | (1 << TXEN0) | (1 << TXCIE0); */
     // UCSR0B = (1 << RXEN0) | (1 << RXCIE0);
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  //8 bit data format
     sei();
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
     while (1){
-        char cmd = '0';
-        char ser = '0';
-        ser = rxBuffer[1];
-        cmd = rxBuffer[2];
-        if (ser == '1'){
+        uint8_t syn = rxBuffer[0];
+        uint8_t ser = rxBuffer[1];
+        uint8_t cmd = rxBuffer[2];
+        if ( (ser == 0x1F) ){
              switch (cmd){
-                case ('f'):
-                    PORTB |= (1 << PB5);
+                case (0xDA):
+                    PORTB |= (1 << PB1);
                     break;
-                case('b'):
+                case(0xCB):
                     PORTB |= (1 << PB4);
                     break;
-                case('r'):
+                case(0x62):
                     PORTB |=  (1 << PB3);
                     break;
-                case('l'):
+                case(0xFA):
                     PORTB |=  (1 << PB2);
                     break;
-                default:
-                    PORTB &=~ (1 << PB5);
+                case(0x05):
+                    PORTB &=~ (1 << PB1);
                     PORTB &=~ (1 << PB4);
                     PORTB &=~ (1 << PB3);
                     PORTB &=~ (1 << PB2);
@@ -84,10 +82,10 @@ int main(void){
             }
         }
         else{
-                PORTB &=~ (1 << PB5);
-                PORTB &=~ (1 << PB4);
-                PORTB &=~ (1 << PB3);
-                PORTB &=~ (1 << PB2);
+                /* PORTB &=~ (1 << PB5); */
+                /* PORTB &=~ (1 << PB4); */
+                /* PORTB &=~ (1 << PB3); */
+                /* PORTB &=~ (1 << PB2); */
         }
         }
 
@@ -96,9 +94,8 @@ int main(void){
 
 ISR(USART_RX_vect)
 {
-    if (rxReadPos != 3){ //now we are reading the info from the buffer index by index to be transmitted
+    if (rxReadPos != bufferSize){ //now we are reading the info from the buffer index by index to be transmitted
         rxBuffer[rxReadPos] = UDR0; //tx read pos just used to index the buffer data to be transmitted
-        /* UDR0 = rxBuffer[rxReadPos]; //tx read pos just used to index the buffer data to be transmitted */
         rxReadPos ++;
         if (rxReadPos >= bufferSize){
             rxReadPos = 0;
