@@ -24,7 +24,6 @@
 
 /* volatile uint8_t rxBuffer[bufferSize] = {0x00, 0x00, 0x00}; */
 volatile char rxBuffer[bufferSize] = {'0', '0', '0'};
-
 volatile int  rxWritePos = 0;
 volatile int  rxReadPos = 0;
 
@@ -37,6 +36,30 @@ char syn = '0';
 /* volatile uint8_t ser = 0x00; */
 /* volatile uint8_t cmd = 0x00; */
 /* volatile uint8_t syn = 0x00; */
+
+
+char appendRx(void)
+{
+    char ret = '\0';
+    if (rxReadPos != rxWritePos){
+        ret = rxBuffer[rxReadPos];
+        rxReadPos++;
+        if(rxReadPos >= bufferSize){
+            rxReadPos = 0;
+        }
+    }
+    return ret;
+}
+
+
+
+/* void rxPacket(char rxByte, char command){ */
+/*     appendTx(syncByte); */
+/*     appendTx(rxByte); */
+/*     appendTx(command); */
+/*     nullByteIfEmpty(); */
+/* } */
+
 
 
 int main(void){
@@ -54,47 +77,55 @@ int main(void){
 
     UCSR0A = 0x00;
     //transimit and recieve enable
-    UCSR0B =  (1 << RXEN0) | (1 << RXCIE0);
-        /* | (1 << TXEN0) | (1 << TXCIE0); */
+    UCSR0B =  (1 << RXEN0) | (1 << RXCIE0) | (1 << TXEN0) | (1 << TXCIE0);
     // UCSR0B = (1 << RXEN0) | (1 << RXCIE0);
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  //8 bit data format
     sei();
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
     while (1){
-       syn = rxBuffer[0];
-       ser = rxBuffer[1];
-       cmd = rxBuffer[2];
-       if ( (ser == num1) ){
-           /* PORTD &=~ ( 1 << PD6 ); */
-             switch (cmd){
-                case ('f'):
-                    PORTB |= (1 << PB1);
-                    break;
-                case('b'):
-                    PORTB |= (1 << PB4);
-                    break;
-                case('l'):
-                    PORTB |=  (1 << PB3);
-                    break;
-                case('r'):
-                    PORTB |=  (1 << PB2);
-                    break;
-                case('n'):
-                    PORTB &=~ (1 << PB1);
-                    PORTB &=~ (1 << PB4);
-                    PORTB &=~ (1 << PB3);
-                    PORTB &=~ (1 << PB2);
-                    break;
-            }
-        }
-        else{
-                 PORTD |= (1 << PD6);
-                /* PORTB &=~ (1 << PB5); */
-                /* PORTB &=~ (1 << PB4); */
-                /* PORTB &=~ (1 << PB3); */
-                /* PORTB &=~ (1 << PB2); */
-        }
+
+        /* char c = appendRx(); */
+        char syn = appendRx();
+        char ser = appendRx();
+        char cmd = appendRx();
+        UDR0 = '0';
+        UDR0 = syn;
+        /* UDR0 = '0'; */
+        /* UDR0 = ser; */
+        /* UDR0 = '0'; */
+        /* UDR0 = cmd; */
+
+       /* if ( (ser == num1) ){ */
+       /*     /\* PORTD &=~ ( 1 << PD6 ); *\/ */
+       /*       switch (cmd){ */
+       /*          case ('f'): */
+       /*              PORTB |= (1 << PB1); */
+       /*              break; */
+       /*          case('b'): */
+       /*              PORTB |= (1 << PB4); */
+       /*              break; */
+       /*          case('l'): */
+       /*              PORTB |=  (1 << PB3); */
+       /*              break; */
+       /*          case('r'): */
+       /*              PORTB |=  (1 << PB2); */
+       /*              break; */
+       /*          case('n'): */
+       /*              PORTB &=~ (1 << PB1); */
+       /*              PORTB &=~ (1 << PB4); */
+       /*              PORTB &=~ (1 << PB3); */
+       /*              PORTB &=~ (1 << PB2); */
+       /*              break; */
+       /*      } */
+       /*  } */
+       /*  else{ */
+       /*           PORTD |= (1 << PD6); */
+       /*          /\* PORTB &=~ (1 << PB5); *\/ */
+       /*          /\* PORTB &=~ (1 << PB4); *\/ */
+       /*          /\* PORTB &=~ (1 << PB3); *\/ */
+       /*          /\* PORTB &=~ (1 << PB2); *\/ */
+       /*  } */
         }
 
     return 0;
@@ -102,13 +133,11 @@ int main(void){
 
 ISR(USART_RX_vect)
 {
-    if (rxReadPos != bufferSize){ //now we are reading the info from the buffer index by index to be transmitted
-        rxBuffer[rxReadPos] = UDR0; //tx read pos just used to index the buffer data to be transmitted
-        /* UDR0 = rxBuffer[rxReadPos]; //tx read pos just used to index the buffer data to be transmitted */
-        rxReadPos ++;
-        if (rxReadPos >= bufferSize){
-            rxReadPos = 0;
-        }
+    rxBuffer[rxWritePos] = UDR0;
+    UDR0 = rxBuffer[rxWritePos];
+    rxWritePos++;
+    if (rxWritePos >= bufferSize){
+        rxWritePos = 0;
     }
 }
 
