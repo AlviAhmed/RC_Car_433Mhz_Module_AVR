@@ -54,30 +54,37 @@ volatile char txBuffer[bufferSize] = {'0', '0', '0'};
 volatile int  txWritePos = 0;
 volatile int  txReadPos = 0;
 
+void nullByteIfEmpty(){
+    if (UCSR0A & (1 << UDRE0)) { //if the UDRE register is empty, then send a null byte, just to make sure no junk is put in to the register
+        UDR0 = 0x00;
+     }
+}
 
-/* void appendTx(char data_byte) */
-/* { */
-/*     txBuffer[txWritePos] = data_byte; */
-/*     txWritePos++; //increment global write position as you are inputting things into the array */
-/*     if (txWritePos >= bufferSize){ */
-/*         txWritePos  = 0; */
-/*     } */
-/* } */
+void appendTx(char data_byte)
+{
+    txBuffer[txWritePos] = data_byte;
+    txWritePos++; //increment global write position as you are inputting things into the array
+    if (txWritePos >= bufferSize){
+        txWritePos  = 0;
+    }
+}
 
 
 
 void txPacket(char rxByte, char command){
-    /* appendTx(syncByte); */
-    /* appendTx(rxByte); */
-    /* appendTx(command); */
-    txBuffer[0] = syncByte;
-    txBuffer[1] = rxByte;
-    txBuffer[2] = command;
+    appendTx(syncByte);
+    appendTx(rxByte);
+    appendTx(command);
+    nullByteIfEmpty();
+    /* txBuffer[0] = syncByte; */
+    /* txBuffer[1] = rxByte; */
+    /* txBuffer[2] = command; */
 }
 void txPacketNeutral(char command){
-    txBuffer[0] = command;
-    txBuffer[1] = command;
-    txBuffer[2] = command;
+    appendTx(command);
+    appendTx(command);
+    appendTx(command);
+    nullByteIfEmpty();
 }
 
 
@@ -149,14 +156,16 @@ ISR(PCINT0_vect){
     }
     else {
         txPacketNeutral('n');
+            /* txWritePos = 0; */
+        /* txW */
         PORTB &=~ (1 << PB0);
     }
 }
 
 ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
 {
-    _delay_ms(500);
-    if (txReadPos != bufferSize){ //now we are reading the info from the buffer index by index to be transmitted
+    /* _delay_ms(300); */
+    if (txReadPos != txWritePos){ //now we are reading the info from the buffer index by index to be transmitted
         UDR0 = txBuffer[txReadPos]; //tx read pos just used to index the buffer data to be transmitted
         txBuffer[txReadPos] = UDR0; //tx read pos just used to index the buffer data to be transmitted
         txReadPos ++;
