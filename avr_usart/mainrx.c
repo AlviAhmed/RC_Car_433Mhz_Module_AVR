@@ -27,10 +27,11 @@ volatile char rxBuffer[bufferSize] = {'0', '0', '0'};
 volatile int  rxWritePos = 0;
 volatile int  rxReadPos = 0;
 
-char num1 = '1'; 
-char ser = '0';
-char cmd = '0';
-char syn = '0';
+volatile char num1 = '1';
+volatile  char ser = '0';
+volatile char cmd = '0';
+volatile char syn = '0';
+volatile char get = '0';
 
 /* volatile uint8_t num1 = 0x1F; */
 /* volatile uint8_t ser = 0x00; */
@@ -52,6 +53,11 @@ char appendRx(void)
 }
 
 
+
+/* char readRx(void){ */
+
+
+/* } */
 
 /* void rxPacket(char rxByte, char command){ */
 /*     appendTx(syncByte); */
@@ -83,49 +89,49 @@ int main(void){
     sei();
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
+    int delay_num = 10;
     while (1){
 
-        /* char c = appendRx(); */
-        char syn = appendRx();
-        char ser = appendRx();
-        char cmd = appendRx();
-        UDR0 = '0';
-        UDR0 = syn;
-        /* UDR0 = '0'; */
-        /* UDR0 = ser; */
-        /* UDR0 = '0'; */
-        /* UDR0 = cmd; */
-
-       /* if ( (ser == num1) ){ */
-       /*     /\* PORTD &=~ ( 1 << PD6 ); *\/ */
-       /*       switch (cmd){ */
-       /*          case ('f'): */
-       /*              PORTB |= (1 << PB1); */
-       /*              break; */
-       /*          case('b'): */
-       /*              PORTB |= (1 << PB4); */
-       /*              break; */
-       /*          case('l'): */
-       /*              PORTB |=  (1 << PB3); */
-       /*              break; */
-       /*          case('r'): */
-       /*              PORTB |=  (1 << PB2); */
-       /*              break; */
-       /*          case('n'): */
-       /*              PORTB &=~ (1 << PB1); */
-       /*              PORTB &=~ (1 << PB4); */
-       /*              PORTB &=~ (1 << PB3); */
-       /*              PORTB &=~ (1 << PB2); */
-       /*              break; */
-       /*      } */
-       /*  } */
-       /*  else{ */
-       /*           PORTD |= (1 << PD6); */
-       /*          /\* PORTB &=~ (1 << PB5); *\/ */
-       /*          /\* PORTB &=~ (1 << PB4); *\/ */
-       /*          /\* PORTB &=~ (1 << PB3); *\/ */
-       /*          /\* PORTB &=~ (1 << PB2); *\/ */
-       /*  } */
+         /* UDR0 = 'x'; */
+         _delay_ms(delay_num);
+         /* UDR0 = syn; */
+         /* _delay_ms(delay_num); */
+         /* UDR0 = 'y'; */
+         /* _delay_ms(delay_num); */
+         /* UDR0 = ser; */
+         /* _delay_ms(delay_num); */
+         /* UDR0 = 'z'; */
+         /* _delay_ms(delay_num); */
+         /* UDR0 = cmd; */
+         /* _delay_ms(delay_num); */
+       if ( (ser == num1) ){
+             switch (cmd){
+                case ('f'):
+                    PORTB |= (1 << PB1);
+                    break;
+                case('b'):
+                    PORTB |= (1 << PB4);
+                    break;
+                case('l'):
+                    PORTB |=  (1 << PB3);
+                    break;
+                case('r'):
+                    PORTB |=  (1 << PB2);
+                    break;
+                case('n'):
+                    PORTB &=~ (1 << PB1);
+                    PORTB &=~ (1 << PB4);
+                    PORTB &=~ (1 << PB3);
+                    PORTB &=~ (1 << PB2);
+                    break;
+            }
+       }
+       else{
+                PORTB &=~ (1 << PB5);
+                PORTB &=~ (1 << PB4);
+                PORTB &=~ (1 << PB3);
+                PORTB &=~ (1 << PB2);
+       }
         }
 
     return 0;
@@ -134,11 +140,26 @@ int main(void){
 ISR(USART_RX_vect)
 {
     rxBuffer[rxWritePos] = UDR0;
-    UDR0 = rxBuffer[rxWritePos];
-    rxWritePos++;
-    if (rxWritePos >= bufferSize){
-        rxWritePos = 0;
+    if (rxBuffer[0] == 's'){
+    switch (rxWritePos){
+            case(0):
+                syn = rxBuffer[rxWritePos];
+                break;
+            case(1):
+                ser = rxBuffer[rxWritePos];
+                break;
+            case(2):
+                cmd = rxBuffer[rxWritePos];
+                break;
     }
+    }
+    else{
+        rxWritePos = -1;
+    }
+    rxWritePos++;
+        if (rxWritePos >= bufferSize){
+            rxWritePos = 0;
+        }
 }
 
 ISR(BADISR_vect){

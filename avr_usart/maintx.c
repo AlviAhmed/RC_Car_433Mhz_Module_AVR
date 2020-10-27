@@ -155,7 +155,8 @@ ISR(PCINT0_vect){
         PORTB |= (1 << PB0);
     }
     else {
-        txPacketNeutral('n');
+        txPacket(rxSerNum, 'n');
+        /* txPacketNeutral('n'); */
             /* txWritePos = 0; */
         /* txW */
         PORTB &=~ (1 << PB0);
@@ -167,7 +168,7 @@ ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
     /* _delay_ms(300); */
     if (txReadPos != txWritePos){ //now we are reading the info from the buffer index by index to be transmitted
         UDR0 = txBuffer[txReadPos]; //tx read pos just used to index the buffer data to be transmitted
-        txBuffer[txReadPos] = UDR0; //tx read pos just used to index the buffer data to be transmitted
+        /* txBuffer[txReadPos] = UDR0; //tx read pos just used to index the buffer data to be transmitted */
         txReadPos ++;
         if (txReadPos >= bufferSize){
             txReadPos = 0;
