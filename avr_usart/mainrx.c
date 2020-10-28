@@ -27,7 +27,7 @@ volatile char rxBuffer[bufferSize] = {'0', '0', '0'};
 volatile int  rxWritePos = 0;
 volatile int  rxReadPos = 0;
 
-volatile char num1 = '1';
+volatile char num1 = '2';
 volatile  char ser = '0';
 volatile char cmd = '0';
 volatile char syn = '0';
@@ -163,6 +163,10 @@ ISR(USART_RX_vect)
     }
     else{
         rxWritePos = -1;
+        PORTB &=~ (1 << PB5);
+        PORTB &=~ (1 << PB4);
+        PORTB &=~ (1 << PB3);
+        PORTB &=~ (1 << PB2);
     }
 
        /* if ( (enable == 1) ){ */
