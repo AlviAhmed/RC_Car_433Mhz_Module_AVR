@@ -33,6 +33,7 @@ volatile char cmd = '0';
 volatile char syn = '0';
 volatile char get = '0';
 
+volatile int enable = 0;
 /* volatile uint8_t num1 = 0x1F; */
 /* volatile uint8_t ser = 0x00; */
 /* volatile uint8_t cmd = 0x00; */
@@ -91,9 +92,9 @@ int main(void){
     UDR0 = 0;
     int delay_num = 10;
     while (1){
-
+         /* _delay_ms(delay_num); */
          /* UDR0 = 'x'; */
-         _delay_ms(delay_num);
+         /* _delay_ms(delay_num); */
          /* UDR0 = syn; */
          /* _delay_ms(delay_num); */
          /* UDR0 = 'y'; */
@@ -104,7 +105,7 @@ int main(void){
          /* _delay_ms(delay_num); */
          /* UDR0 = cmd; */
          /* _delay_ms(delay_num); */
-       if ( (ser == num1) ){
+       if ( (enable == 1) ){
              switch (cmd){
                 case ('f'):
                     PORTB |= (1 << PB1);
@@ -140,6 +141,7 @@ int main(void){
 ISR(USART_RX_vect)
 {
     rxBuffer[rxWritePos] = UDR0;
+    UDR0 = rxBuffer[rxWritePos];
     if (rxBuffer[0] == 's'){
     switch (rxWritePos){
             case(0):
@@ -147,6 +149,12 @@ ISR(USART_RX_vect)
                 break;
             case(1):
                 ser = rxBuffer[rxWritePos];
+                if (ser == num1){
+                    enable = 1;
+                }
+                else{
+                    enable = 0;
+                }
                 break;
             case(2):
                 cmd = rxBuffer[rxWritePos];
@@ -156,6 +164,36 @@ ISR(USART_RX_vect)
     else{
         rxWritePos = -1;
     }
+
+       /* if ( (enable == 1) ){ */
+       /*       switch (cmd){ */
+       /*          case ('f'): */
+       /*              PORTB |= (1 << PB1); */
+       /*              break; */
+       /*          case('b'): */
+       /*              PORTB |= (1 << PB4); */
+       /*              break; */
+       /*          case('l'): */
+       /*              PORTB |=  (1 << PB3); */
+       /*              break; */
+       /*          case('r'): */
+       /*              PORTB |=  (1 << PB2); */
+       /*              break; */
+       /*          case('n'): */
+       /*              PORTB &=~ (1 << PB1); */
+       /*              PORTB &=~ (1 << PB4); */
+       /*              PORTB &=~ (1 << PB3); */
+       /*              PORTB &=~ (1 << PB2); */
+       /*              break; */
+       /*      } */
+       /* } */
+       /* else{ */
+       /*          PORTB &=~ (1 << PB5); */
+       /*          PORTB &=~ (1 << PB4); */
+       /*          PORTB &=~ (1 << PB3); */
+       /*          PORTB &=~ (1 << PB2); */
+       /* } */
+
     rxWritePos++;
         if (rxWritePos >= bufferSize){
             rxWritePos = 0;
