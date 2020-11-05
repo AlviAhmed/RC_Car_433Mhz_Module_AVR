@@ -27,18 +27,36 @@ volatile char rxBuffer[bufferSize] = {'0', '0', '0'};
 volatile int  rxWritePos = 0;
 volatile int  rxReadPos = 0;
 
-volatile char num1 = '2';
 volatile  char ser = '0';
 volatile char cmd = '0';
 volatile char syn = '0';
 volatile char get = '0';
 
 volatile int enable = 0;
-/* volatile uint8_t num1 = 0x1F; */
-/* volatile uint8_t ser = 0x00; */
-/* volatile uint8_t cmd = 0x00; */
-/* volatile uint8_t syn = 0x00; */
 
+volatile char keyboard_key = 'n';
+
+volatile int ser_bool = 0;
+volatile char rxSerNum = '1';
+volatile char syncByte = 's'; 
+volatile char num1 = '1';
+volatile char num2 = '2';
+volatile char txByte = '0';
+volatile int cmd_pcint = 1;
+
+/* volatile uint8_t txBuffer[bufferSize] = {0x00, 0x00, 0x00}; */
+
+
+volatile char txBuffer[bufferSize] = {'0', '0', '0'};
+volatile int  txWritePos = 0;
+volatile int  txReadPos = 0;
+
+
+void txPacket(char rxByte, char command){
+    txBuffer[0] = syncByte;
+    txBuffer[1] = rxByte;
+    txBuffer[2] = command;
+}
 
 char appendRx(void)
 {
@@ -54,24 +72,25 @@ char appendRx(void)
 }
 
 
-
-/* char readRx(void){ */
-
-
-/* } */
-
-/* void rxPacket(char rxByte, char command){ */
-/*     appendTx(syncByte); */
-/*     appendTx(rxByte); */
-/*     appendTx(command); */
-/*     nullByteIfEmpty(); */
-/* } */
-
-
+void serial_debug(){
+    _delay_ms(10);
+    UDR0 = 'x';
+    _delay_ms(10);
+    UDR0 = syn;
+    _delay_ms(10);
+    UDR0 = 'y';
+    _delay_ms(10);
+    UDR0 = ser;
+    _delay_ms(10);
+    UDR0 = 'z';
+    _delay_ms(10);
+    UDR0 = cmd;
+    _delay_ms(10);
+}
 
 int main(void){
-    DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1);
-    PORTB &= ~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | ( 1 << PB1 );
+    DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1) | (1 << PB0);
+    PORTB &= ~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | ( 1 << PB1 ) | (1 << PB0);
 
     DDRD |= (1 << PD7) | (1 << PD6);
     PORTD &=~ (1 << PD7)| ( 1 << PD6 );
@@ -90,120 +109,56 @@ int main(void){
     sei();
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
-    int delay_num = 10;
     while (1){
-         /* _delay_ms(delay_num); */
-         /* UDR0 = 'x'; */
-         /* _delay_ms(delay_num); */
-         /* UDR0 = syn; */
-         /* _delay_ms(delay_num); */
-         /* UDR0 = 'y'; */
-         /* _delay_ms(delay_num); */
-         /* UDR0 = ser; */
-         /* _delay_ms(delay_num); */
-         /* UDR0 = 'z'; */
-         /* _delay_ms(delay_num); */
-         /* UDR0 = cmd; */
-         /* _delay_ms(delay_num); */
-       if ( (enable == 1) ){
-             switch (cmd){
-                case ('f'):
-                    PORTB |= (1 << PB1);
-                    break;
-                case('b'):
-                    PORTB |= (1 << PB4);
-                    break;
-                case('l'):
-                    PORTB |=  (1 << PB3);
-                    break;
-                case('r'):
-                    PORTB |=  (1 << PB2);
-                    break;
-                case('n'):
-                    PORTB &=~ (1 << PB1);
-                    PORTB &=~ (1 << PB4);
-                    PORTB &=~ (1 << PB3);
-                    PORTB &=~ (1 << PB2);
-                    break;
-            }
-       }
-       else{
-                PORTB &=~ (1 << PB5);
-                PORTB &=~ (1 << PB4);
-                PORTB &=~ (1 << PB3);
-                PORTB &=~ (1 << PB2);
-       }
+    switch (keyboard_key){
+        case ('f'):
+            txPacket(rxSerNum, 'f');
+            PORTB |= (1 << PB1);
+            PORTB &=~ (1 << PB0);
+            break;
+        case('b'):
+            txPacket(rxSerNum, 'b');
+            PORTB |= (1 << PB4);
+            PORTB &=~ (1 << PB0);
+            break;
+        case('l'):
+            txPacket(rxSerNum, 'l');
+            PORTB |=  (1 << PB3);
+            PORTB &=~ (1 << PB0);
+            break;
+        case('r'):
+            txPacket(rxSerNum, 'r');
+            PORTB |=  (1 << PB2);
+            PORTB &=~ (1 << PB0);
+            break;
+        case('n'):
+            txPacket(rxSerNum, 'n');
+            PORTB |= (1 << PB0);
+            PORTB &=~ (1 << PB1);
+            PORTB &=~ (1 << PB4);
+            PORTB &=~ (1 << PB3);
+            PORTB &=~ (1 << PB2);
+            break;
         }
+    }
 
     return 0;
 }  
 
-ISR(USART_RX_vect)
+
+ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
 {
-    rxBuffer[rxWritePos] = UDR0;
-    UDR0 = rxBuffer[rxWritePos];
-    if (rxBuffer[0] == 's'){
-    switch (rxWritePos){
-            case(0):
-                syn = rxBuffer[rxWritePos];
-                break;
-            case(1):
-                ser = rxBuffer[rxWritePos];
-                if (ser == num1){
-                    enable = 1;
-                }
-                else{
-                    enable = 0;
-                }
-                break;
-            case(2):
-                cmd = rxBuffer[rxWritePos];
-                break;
-    }
-    }
-    else{
-        rxWritePos = -1;
-        PORTB &=~ (1 << PB5);
-        PORTB &=~ (1 << PB4);
-        PORTB &=~ (1 << PB3);
-        PORTB &=~ (1 << PB2);
-    }
-
-       /* if ( (enable == 1) ){ */
-       /*       switch (cmd){ */
-       /*          case ('f'): */
-       /*              PORTB |= (1 << PB1); */
-       /*              break; */
-       /*          case('b'): */
-       /*              PORTB |= (1 << PB4); */
-       /*              break; */
-       /*          case('l'): */
-       /*              PORTB |=  (1 << PB3); */
-       /*              break; */
-       /*          case('r'): */
-       /*              PORTB |=  (1 << PB2); */
-       /*              break; */
-       /*          case('n'): */
-       /*              PORTB &=~ (1 << PB1); */
-       /*              PORTB &=~ (1 << PB4); */
-       /*              PORTB &=~ (1 << PB3); */
-       /*              PORTB &=~ (1 << PB2); */
-       /*              break; */
-       /*      } */
-       /* } */
-       /* else{ */
-       /*          PORTB &=~ (1 << PB5); */
-       /*          PORTB &=~ (1 << PB4); */
-       /*          PORTB &=~ (1 << PB3); */
-       /*          PORTB &=~ (1 << PB2); */
-       /* } */
-
-    rxWritePos++;
-        if (rxWritePos >= bufferSize){
-            rxWritePos = 0;
+    if (txReadPos != bufferSize){ //now we are reading the info from the buffer index by index to be transmitted
+        UDR0 = txBuffer[txReadPos]; //tx read pos just used to index the buffer data to be transmitted
+        txReadPos ++;
+        if (txReadPos >= bufferSize){
+            txReadPos = 0;
         }
+    }
 }
 
-ISR(BADISR_vect){
-    PORTD ^= PD7;
+ISR(USART_RX_vect)
+{
+    keyboard_key = UDR0;
+
 }

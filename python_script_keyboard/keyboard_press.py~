@@ -1,0 +1,30 @@
+import pynput 
+import time
+
+from pynput.keyboard import Key, Listener, Controller
+
+
+
+# For detecting and logging key presses
+def on_press(key):
+ print('{0} released'.format(key))
+
+def on_release(key):
+ if key == Key.esc:
+   return False
+
+with Listener( on_press = on_press, on_release = on_release ) as listener:
+ listener.join()
+
+
+
+
+
+# For typing a character or a string
+
+# keyboard = Controller()
+# time.sleep(2)
+
+# keyboard.press('i')
+# keyboard.release('i')
+# keyboard.type("This is a sentence written in Python")

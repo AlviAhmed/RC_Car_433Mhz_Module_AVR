@@ -112,7 +112,7 @@ int main(void){
 
 //transimit and recieve enable
     UCSR0A = 0x00;
-    UCSR0B = (1 << TXEN0) | (1 << TXCIE0); //enabling tranmission interrupt
+    UCSR0B = (1 << TXEN0) | (1 << TXCIE0) | (1 << RXCIE0) | (1 << RXEN0); //enabling tranmission interrupt
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  //8 bit data format
 
     UDR0 = 0;
