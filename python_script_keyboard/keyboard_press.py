@@ -6,6 +6,8 @@ import sys
 import threading
 
 
+
+
 class SerialThread(threading.Thread):
  def run(self):
   ser = serial.Serial('/dev/ttyUSB0')
@@ -21,10 +23,17 @@ class SerialThread(threading.Thread):
 class KeyboardThread(threading.Thread):
  def run(self):
   ser = serial.Serial('/dev/ttyUSB0')
+
+  def serTog(key):
+   if key.char == "1":
+     ser.write(b'1')
+   elif key.char == "2":
+     ser.write(b'2')
+
   def on_press(key):
    try:
     print('{0} pressed'.format(key))
-
+    serTog(key)
     if key.char == "f":
      ser.write(b'f')
     elif key.char == "b":
@@ -36,7 +45,6 @@ class KeyboardThread(threading.Thread):
     else:
      ser.write(b'n')
      
-
     if key.char == "q":
      exit()
    except AttributeError:
