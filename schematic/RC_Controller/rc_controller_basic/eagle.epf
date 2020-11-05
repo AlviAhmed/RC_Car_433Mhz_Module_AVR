@@ -284,11 +284,15 @@ UsedLibrary="/home/al/EAGLE/libraries/powerboost.lbr"
 UsedLibrary="/home/al/EAGLE/libraries/srg.lbr"
 UsedLibrary="/home/al/EAGLE/libraries/tps6103x.lbr"
 UsedLibrary="/home/al/EAGLE/libraries/trinket.lbr"
+UsedLibrary="/home/al/EAGLE/libraries/at24mac402.lbr"
+UsedLibrary="/home/al/EAGLE/libraries/atmega328.lbr"
+UsedLibrary="/home/al/EAGLE/libraries/in28j60.lbr"
+UsedLibrary="/home/al/EAGLE/libraries/pem1300.lbr"
 
 [Win_1]
 Type="Control Panel"
 Number=0
 
 [Desktop]
-Screen="1600 900"
+Screen="1680 1050"
 Window="Win_1"
