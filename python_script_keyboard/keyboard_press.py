@@ -6,11 +6,11 @@ import sys
 import threading
 
 
-
+port = '/dev/ttyUSB1'
 
 class SerialThread(threading.Thread):
  def run(self):
-  ser = serial.Serial('/dev/ttyUSB1')
+  ser = serial.Serial(port)
   print (ser)
   if (ser.is_open == True):
       message_ser = "The serial port is open"
@@ -22,7 +22,7 @@ class SerialThread(threading.Thread):
     
 class KeyboardThread(threading.Thread):
  def run(self):
-  ser = serial.Serial('/dev/ttyUSB1')
+  ser = serial.Serial(port)
 
   def serTog(key):
    if key.char == "1":
