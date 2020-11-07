@@ -23,11 +23,11 @@
 #define BAUD 9600 //same rate as in the Makefile baud is in bits per second
 #define ubbrn ((F_CPU/16/BAUD) - 1)
 
-#define but3 (~PINB) & (1 << PB5) // PCINT5
-#define but2 (~PINB) & (1 << PB4) // PCINT4
-#define but1 (~PINB) & (1 << PB3) // PCINT3
-#define but0 (~PINB) & (1 << PB2) // PCINT2
-#define butTog (~PINB) & (1 << PB1) // PCINT0
+#define but3 (~PINB) & (1 << PB4) // PCINT5
+#define but2 (~PINB) & (1 << PB3) // PCINT4
+#define but1 (~PINB) & (1 << PB2) // PCINT3
+#define but0 (~PINB) & (1 << PB1) // PCINT2
+#define butTog (~PINB) & (1 << PB0) // PCINT0
 
 #define bufferSize 3
 

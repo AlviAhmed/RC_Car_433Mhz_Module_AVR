@@ -166,7 +166,6 @@ ISR(USART_RX_vect)
         rxSerNum = '1';
         PORTD |= (1 << PD7);
         PORTD &=~ (1 << PD6);
-        
     }
     else if (keyboard_key == '2'){
         rxSerNum = '2';

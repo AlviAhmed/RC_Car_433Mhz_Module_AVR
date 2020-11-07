@@ -6,7 +6,7 @@ import sys
 import threading
 
 
-port = '/dev/ttyUSB1'
+port = '/dev/ttyUSB3'
 
 class SerialThread(threading.Thread):
  def run(self):
@@ -32,7 +32,7 @@ class KeyboardThread(threading.Thread):
 
   def on_press(key):
    try:
-    print('{0} pressed'.format(key))
+    # print('{0} pressed'.format(key))
     serTog(key)
     if key.char == "f":
      ser.write(b'f')

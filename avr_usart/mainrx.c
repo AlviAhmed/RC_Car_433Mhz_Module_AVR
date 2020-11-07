@@ -30,6 +30,7 @@ volatile int  rxReadPos = 0;
 volatile char rxSerNum = '1';
 
 volatile char num1 = '1';
+volatile char num2 = '2';
 volatile  char ser = '0';
 volatile char cmd = '0';
 volatile char syn = '0';
@@ -68,19 +69,23 @@ int main(void){
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
     int delay_num = 10;
-    while (1){ 
+    while (1){
        if ( (enable == 1) ){
              switch (cmd){
                 case ('f'):
-                    PORTB |= (1 << PB1);
+                    PORTB |= (1 << PB3);
+                    PORTB |= (1 << PB2);
                     break;
                 case('b'):
                     PORTB |= (1 << PB4);
+                    PORTB |= (1 << PB1);
                     break;
                 case('l'):
+                    PORTB |=  (1 << PB1);
                     PORTB |=  (1 << PB3);
                     break;
                 case('r'):
+                    PORTB |=  (1 << PB4);
                     PORTB |=  (1 << PB2);
                     break;
                 case('n'):
