@@ -15913,10 +15913,13 @@ Source: www.cotorelay.com .. Coto_Technology__CT10-1530-G1.pdf</description>
 <part name="IC2" library="v-reg" library_urn="urn:adsk.eagle:library:409" deviceset="LM317TL" device="" package3d_urn="urn:adsk.eagle:package:30344/1"/>
 <part name="C3" library="capacitor-wima" library_urn="urn:adsk.eagle:library:116" deviceset="C" device="2,5-3" package3d_urn="urn:adsk.eagle:package:5436/1" value="0.1uF"/>
 <part name="C5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-US" device="153CLV-0810" package3d_urn="urn:adsk.eagle:package:23401/2" value="1uF"/>
-<part name="R2" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="1k"/>
-<part name="R3" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="8.6k"/>
+<part name="R2" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="1.2k"/>
+<part name="R3" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="3.83k"/>
 <part name="GND5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="SW1" library="switch-coto" library_urn="urn:adsk.eagle:library:374" deviceset="CT10-XXXX-" device="A2" package3d_urn="urn:adsk.eagle:package:27090/1"/>
+<part name="G2" library="battery" library_urn="urn:adsk.eagle:library:109" deviceset="AB9V" device="" package3d_urn="urn:adsk.eagle:package:4600/1"/>
+<part name="GND6" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="P+4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="VCC" device="" value="5V"/>
 </parts>
 <sheets>
 <sheet>
@@ -16005,6 +16008,16 @@ Source: www.cotorelay.com .. Coto_Technology__CT10-1530-G1.pdf</description>
 <instance part="SW1" gate="G$1" x="71.12" y="43.18" smashed="yes" rot="R90">
 <attribute name="NAME" x="68.58" y="39.37" size="1.778" layer="95" rot="R90"/>
 </instance>
+<instance part="G2" gate="G$1" x="-33.02" y="83.82" smashed="yes" rot="R90">
+<attribute name="NAME" x="-36.195" y="78.105" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-27.94" y="78.105" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="GND6" gate="1" x="-33.02" y="63.5" smashed="yes">
+<attribute name="VALUE" x="-35.56" y="60.96" size="1.778" layer="96"/>
+</instance>
+<instance part="P+4" gate="VCC" x="38.1" y="106.68" smashed="yes">
+<attribute name="VALUE" x="35.56" y="104.14" size="1.778" layer="96" rot="R90"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -16041,6 +16054,21 @@ Source: www.cotorelay.com .. Coto_Technology__CT10-1530-G1.pdf</description>
 <pinref part="JP1" gate="G$1" pin="2"/>
 <wire x1="142.24" y1="134.62" x2="142.24" y2="124.46" width="0.1524" layer="91"/>
 <label x="142.24" y="124.46" size="1.778" layer="95" rot="R270"/>
+</segment>
+<segment>
+<pinref part="IC2" gate="A" pin="OUT"/>
+<wire x1="7.62" y1="96.52" x2="15.24" y2="96.52" width="0.1524" layer="91"/>
+<pinref part="R2" gate="G$1" pin="2"/>
+<wire x1="15.24" y1="96.52" x2="27.94" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="15.24" y1="93.98" x2="15.24" y2="96.52" width="0.1524" layer="91"/>
+<junction x="15.24" y="96.52"/>
+<pinref part="C5" gate="G$1" pin="+"/>
+<wire x1="27.94" y1="91.44" x2="27.94" y2="96.52" width="0.1524" layer="91"/>
+<label x="27.94" y="96.52" size="1.778" layer="95"/>
+<wire x1="27.94" y1="96.52" x2="38.1" y2="96.52" width="0.1524" layer="91"/>
+<junction x="27.94" y="96.52"/>
+<pinref part="P+4" gate="VCC" pin="VCC"/>
+<wire x1="38.1" y1="96.52" x2="38.1" y2="104.14" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -16110,6 +16138,11 @@ Source: www.cotorelay.com .. Coto_Technology__CT10-1530-G1.pdf</description>
 <junction x="0" y="68.58"/>
 <pinref part="GND5" gate="1" pin="GND"/>
 <wire x1="0" y1="66.04" x2="0" y2="68.58" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="GND6" gate="1" pin="GND"/>
+<pinref part="G2" gate="G$1" pin="-"/>
+<wire x1="-33.02" y1="66.04" x2="-33.02" y2="71.12" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -16262,22 +16295,10 @@ Source: www.cotorelay.com .. Coto_Technology__CT10-1530-G1.pdf</description>
 <pinref part="C3" gate="G$1" pin="1"/>
 <wire x1="-7.62" y1="96.52" x2="-15.24" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="-15.24" y1="96.52" x2="-15.24" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="-15.24" y1="96.52" x2="-20.32" y2="96.52" width="0.1524" layer="91"/>
 <junction x="-15.24" y="96.52"/>
 <label x="-22.86" y="96.52" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="VOUT" class="0">
-<segment>
-<pinref part="IC2" gate="A" pin="OUT"/>
-<wire x1="7.62" y1="96.52" x2="15.24" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="R2" gate="G$1" pin="2"/>
-<wire x1="15.24" y1="96.52" x2="27.94" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="15.24" y1="93.98" x2="15.24" y2="96.52" width="0.1524" layer="91"/>
-<junction x="15.24" y="96.52"/>
-<pinref part="C5" gate="G$1" pin="+"/>
-<wire x1="27.94" y1="91.44" x2="27.94" y2="96.52" width="0.1524" layer="91"/>
-<label x="27.94" y="96.52" size="1.778" layer="95"/>
+<pinref part="G2" gate="G$1" pin="+"/>
+<wire x1="-33.02" y1="96.52" x2="-15.24" y2="96.52" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$1" class="0">
