@@ -3,7 +3,7 @@ CLOCK      = 16000000
 PROGRAMMER = -c avrisp2 -b 115200 
 # PROGRAMMER = -c arduino -b 115200 -P /dev/ttyUSB3
 OBJECTS    = mainrx.c
-FUSES      = -U lfuse:w:0xE2:m	-U hfuse:w:0xD9:m	-U efuse:w:0xFF:m
+FUSES      = -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U efuse:w:0xFF:m
 
 # Tune the lines below only if you know what you are doing:
 

@@ -62,7 +62,8 @@ int main(void){
 
     UCSR0A = 0x00;
     //transimit and recieve enable
-    UCSR0B =  (1 << RXEN0) | (1 << RXCIE0) | (1 << TXEN0) | (1 << TXCIE0);
+    UCSR0B =  (1 << RXEN0) | (1 << RXCIE0);
+        //| (1 << TXEN0) | (1 << TXCIE0);
     // UCSR0B = (1 << RXEN0) | (1 << RXCIE0);
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  //8 bit data format
     sei();
@@ -111,7 +112,7 @@ int main(void){
 ISR(USART_RX_vect)
 {
     rxBuffer[rxWritePos] = UDR0;
-    UDR0 = rxBuffer[rxWritePos];
+    // UDR0 = rxBuffer[rxWritePos];
     if (rxBuffer[0] == 's'){
     switch (rxWritePos){
             case(0):
@@ -119,7 +120,7 @@ ISR(USART_RX_vect)
                 break;
             case(1):
                 ser = rxBuffer[rxWritePos];
-                if (ser == num1){
+                if (ser == num2){
                     enable = 1;
                 }
                 else{

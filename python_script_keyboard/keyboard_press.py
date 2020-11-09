@@ -34,13 +34,13 @@ class KeyboardThread(threading.Thread):
    try:
     # print('{0} pressed'.format(key))
     serTog(key)
-    if key.char == "f":
+    if key.char == "w":
      ser.write(b'f')
-    elif key.char == "b":
+    elif key.char == "s":
      ser.write(b'b')
-    elif key.char == "l":
+    elif key.char == "a":
      ser.write(b'l')
-    elif key.char == "r":
+    elif key.char == "d":
      ser.write(b'r')
     else:
      ser.write(b'n')
