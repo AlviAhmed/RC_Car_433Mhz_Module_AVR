@@ -22,26 +22,24 @@
 #define bufferSize 3
 
 
-/* volatile uint8_t rxBuffer[bufferSize] = {0x00, 0x00, 0x00}; */
-volatile char rxBuffer[bufferSize] = {'0', '0', '0'};
+volatile uint8_t rxBuffer[bufferSize] = {0x00, 0x00, 0x00};
 volatile int  rxWritePos = 0;
 volatile int  rxReadPos = 0;
 
-volatile  char ser = '0';
-volatile char cmd = '0';
-volatile char syn = '0';
-volatile char get = '0';
+volatile  uint8_t ser = 0x00;
+volatile uint8_t cmd = 0x00;
+volatile uint8_t syn = 0xAA;
 
 volatile int enable = 0;
 
-volatile char keyboard_key = 'n';
+volatile char keyboard_key = '0';
 
 volatile int ser_bool = 0;
-volatile char rxSerNum = '1';
-volatile char syncByte = 's'; 
-volatile char num1 = '1';
-volatile char num2 = '2';
-volatile char txByte = '0';
+volatile uint8_t rxSerNum = 0x0C;
+volatile uint8_t syncByte = 0xAA; 
+volatile uint8_t num1 = 0x0C;
+volatile uint8_t num2 = 0x09;
+volatile uint8_t txByte = 0x00;
 volatile int cmd_pcint = 1;
 
 /* volatile uint8_t txBuffer[bufferSize] = {0x00, 0x00, 0x00}; */
@@ -88,14 +86,23 @@ void serial_debug(){
     _delay_ms(10);
 }
 
+/*
+PB4 -> 0x44
+PB3 -> 0xCB 
+PB2 -> 0x62 
+PB1 -> 0xFA 
+else -> 0x05
+*/
+
+
 int main(void){
-    DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1) | (1 << PB0);
-    PORTB &= ~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | ( 1 << PB1 ) | (1 << PB0);
+    DDRB |= (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1) | (1 << PB0);
+    PORTB &= ~ (1 << PB4) | (1 << PB3) | (1 << PB2) | ( 1 << PB1 ) | (1 << PB0);
 
     
     DDRD |= (1 << PD7) | (1 << PD6);
     PORTD &=~ (1 << PD7)| ( 1 << PD6 );
-    /* PORTB |= (1 << PB1); */
+
     //High and low bits
     UBRR0H = (ubbrn >> 8); 
     UBRR0L = ubbrn; 
@@ -110,30 +117,31 @@ int main(void){
     sei();
     ////////////////////////////////////////////////////////////////
     UDR0 = 0;
+
     while (1){
-    switch (keyboard_key){
+        switch (keyboard_key){
         case ('f'):
-            txPacket(rxSerNum, 'f');
+            txPacket(rxSerNum, 0x44);
             PORTB |= (1 << PB1);
             PORTB &=~ (1 << PB0);
             break;
         case('b'):
-            txPacket(rxSerNum, 'b');
+            txPacket(rxSerNum, 0xCB);
             PORTB |= (1 << PB4);
             PORTB &=~ (1 << PB0);
             break;
         case('l'):
-            txPacket(rxSerNum, 'l');
+            txPacket(rxSerNum, 0x62);
             PORTB |=  (1 << PB3);
             PORTB &=~ (1 << PB0);
             break;
         case('r'):
-            txPacket(rxSerNum, 'r');
+            txPacket(rxSerNum, 0xFA);
             PORTB |=  (1 << PB2);
             PORTB &=~ (1 << PB0);
             break;
         case('n'):
-            txPacket(rxSerNum, 'n');
+            txPacket(rxSerNum, 0x05);
             PORTB |= (1 << PB0);
             PORTB &=~ (1 << PB1);
             PORTB &=~ (1 << PB4);
@@ -150,25 +158,25 @@ int main(void){
 ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
 {
     if (txReadPos != bufferSize){ //now we are reading the info from the buffer index by index to be transmitted
-        UDR0 = txBuffer[txReadPos]; //tx read pos just used to index the buffer data to be transmitted
+        txBuffer[txReadPos] = UDR0; //tx read pos just used to index the buffer data to be transmitted
+//        UDR0 = txBuffer[txReadPos]; //tx read pos just used to index the buffer data to be transmitted
         txReadPos ++;
         if (txReadPos >= bufferSize){
             txReadPos = 0;
         }
     }
-    // UDR0 = keyboard_key;
 }
 
 ISR(USART_RX_vect)
 {
     keyboard_key = UDR0;
     if (keyboard_key == '1'){
-        rxSerNum = '1';
+        rxSerNum = num2;
         PORTD |= (1 << PD7);
         PORTD &=~ (1 << PD6);
     }
     else if (keyboard_key == '2'){
-        rxSerNum = '2';
+        rxSerNum = num2;
         PORTD &=~ (1 << PD7);
         PORTD |= (1 << PD6);
         

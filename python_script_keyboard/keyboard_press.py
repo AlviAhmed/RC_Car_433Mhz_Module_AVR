@@ -5,7 +5,6 @@ import serial
 import sys
 import threading
 
-
 port = '/dev/ttyUSB3'
 
 class SerialThread(threading.Thread):
