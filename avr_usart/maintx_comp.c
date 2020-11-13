@@ -22,32 +22,31 @@
 #define bufferSize 3
 
 
-volatile uint8_t rxBuffer[bufferSize] = {0x00, 0x00, 0x00};
+// volatile uint8_t rxBuffer[bufferSize] = {0x00, 0x00, 0x00};
+volatile char rxBuffer[bufferSize] = {'0', '0', '0'};
 volatile int  rxWritePos = 0;
 volatile int  rxReadPos = 0;
 
-volatile  uint8_t ser = 0x00;
-volatile uint8_t cmd = 0x00;
-volatile uint8_t syn = 0xAA;
+volatile  char ser = '0';
+volatile char cmd = '0';
+volatile char syn = '0';
 
 volatile int enable = 0;
 
-volatile char keyboard_key = '0';
+volatile char keyboard_key = 'n';
 
-volatile int ser_bool = 0;
-volatile uint8_t rxSerNum = 0x0C;
-volatile uint8_t syncByte = 0xAA; 
-volatile uint8_t num1 = 0x0C;
-volatile uint8_t num2 = 0x09;
-volatile uint8_t txByte = 0x00;
-volatile int cmd_pcint = 1;
+volatile char rxSerNum = '1';
+volatile char syncByte = 's'; 
+volatile char num1 = '1';
+volatile char num2 = '2';
+volatile char txByte = '0';
 
-volatile uint8_t txBuffer[bufferSize] = {0x00, 0x00, 0x00};
+volatile char txBuffer[bufferSize] = {'0', '0', '0'};
 volatile int  txWritePos = 0;
 volatile int  txReadPos = 0;
 
 
-void txPacket(uint8_t rxByte, uint8_t command){
+void txPacket(char rxByte, char command){
     txBuffer[0] = syncByte;
     txBuffer[1] = rxByte;
     txBuffer[2] = command;
@@ -105,23 +104,23 @@ int main(void){
     while (1){
         switch (keyboard_key){
         case ('f'):
-            txPacket(rxSerNum, 0x44);
+            txPacket(rxSerNum, 'f');
             PORTB |= (1 << PB1);
             break;
         case('b'):
-            txPacket(rxSerNum, 0xCB);
+            txPacket(rxSerNum, 'b');
             PORTB |= (1 << PB4);
             break;
         case('l'):
-            txPacket(rxSerNum, 0x62);
+            txPacket(rxSerNum, 'l');
             PORTB |=  (1 << PB3);
             break;
         case('r'):
-            txPacket(rxSerNum, 0xFA);
+            txPacket(rxSerNum, 'r');
             PORTB |=  (1 << PB2);
             break;
         case('n'):
-            txPacket(rxSerNum, 0x05);
+            txPacket(rxSerNum, 'n');
             PORTB &=~ (1 << PB1);
             PORTB &=~ (1 << PB4);
             PORTB &=~ (1 << PB3);
