@@ -22,17 +22,18 @@
 #define bufferSize 3
 
 
-volatile uint8_t rxBuffer[bufferSize] = {0x00, 0x00, 0x00};
+volatile char rxBuffer[bufferSize] = {'0', '0', '0'};
 volatile int  rxWritePos = 0;
 volatile int  rxReadPos = 0;
 
-volatile uint8_t rxSerNum = 0x09;
+volatile char rxSerNum = '1';
 
-volatile uint8_t num1 = 0x0C;
-volatile uint8_t num2 = 0x09;
-volatile  uint8_t ser = 0x00;
-volatile uint8_t cmd = 0x00;
-volatile uint8_t syn = 0x00;
+volatile char num1 = '1';
+volatile char num2 = '2';
+volatile  char ser = '0';
+volatile char cmd = '0';
+volatile char syn = '0';
+
 
 volatile int enable = 0;
 
@@ -75,23 +76,23 @@ int main(void){
     while (1){
         if ( (enable == 1) ){
             switch (cmd){
-            case (0x44):
+            case ('f'):
                 PORTB |= (1 << PB3);
                 PORTB |= (1 << PB2);
                 break;
-            case(0xCB):
+            case('b'):
                 PORTB |= (1 << PB4);
                 PORTB |= (1 << PB1);
                 break;
-            case(0x62):
+            case('l'):
                 PORTB |=  (1 << PB1);
                 PORTB |=  (1 << PB3);
                 break;
-            case(0xFA):
+            case('r'):
                 PORTB |=  (1 << PB4);
                 PORTB |=  (1 << PB2);
                 break;
-            case(0x05):
+            case('n'):
                 PORTB &=~ (1 << PB4);
                 PORTB &=~ (1 << PB3);
                 PORTB &=~ (1 << PB2);
@@ -113,14 +114,15 @@ int main(void){
 ISR(USART_RX_vect)
 {
     rxBuffer[rxWritePos] = UDR0;
-    if (rxBuffer[0] == 0xAA){
+    UDR0 = rxBuffer[rxWritePos];
+    if (rxBuffer[0] == 's'){
         switch (rxWritePos){
         case(0):
             syn = rxBuffer[rxWritePos];
             break;
         case(1):
             ser = rxBuffer[rxWritePos];
-            if (ser == num2){
+            if (ser == num1){
                 enable = 1;
             }
             else{
