@@ -31,14 +31,6 @@
 
 #define bufferSize 3
 
-
-/* volatile uint8_t rxSerNum = 0x1F; */
-/* volatile uint8_t syncByte = 0xAA; */
-/* volatile uint8_t num1 = 0x1F; */
-/* volatile uint8_t num2 = 0x99; */
-/* volatile uint8_t txByte = 0x00; */
-
-
 volatile int ser_bool = 0;
 volatile char rxSerNum = '1';
 volatile char syncByte = 's'; 
@@ -46,9 +38,6 @@ volatile char num1 = '1';
 volatile char num2 = '2';
 volatile char txByte = '0';
 volatile int cmd_pcint = 1;
-
-/* volatile uint8_t txBuffer[bufferSize] = {0x00, 0x00, 0x00}; */
-
 
 volatile char txBuffer[bufferSize] = {'0', '0', '0'};
 volatile int  txWritePos = 0;
@@ -69,31 +58,11 @@ void appendTx(char data_byte)
     }
 }
 
-
-
 void txPacket(char rxByte, char command){
-    /* appendTx(syncByte); */
-    /* appendTx(rxByte); */
-    /* appendTx(command); */
-    /* nullByteIfEmpty(); */
     txBuffer[0] = syncByte;
-    /* txWritePos++; //increment global write position as you are inputting things into the array */
     txBuffer[1] = rxByte;
-    /* txWritePos++; //increment global write position as you are inputting things into the array */
     txBuffer[2] = command;
-    /* txWritePos++; //increment global write position as you are inputting things into the array */
-    /* if (txWritePos >= bufferSize){ */
-    /*     txWritePos  = 0; */
-    /* } */
 }
-void txPacketNeutral(char command){
-    appendTx(command);
-    appendTx(command);
-    appendTx(command);
-    /* nullByteIfEmpty(); */
-}
-
-
 
 int main(void){
 
@@ -123,17 +92,6 @@ int main(void){
     sei();
     int delay_num = 10;
     while (1){
-        /* UDR0 = 'x'; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = txBuffer[0]; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = 'y'; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = txBuffer[1]; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = 'z'; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = txBuffer[2]; */
         if (ser_bool == 0){
             rxSerNum = num1;
             PORTD |= (1 << PD2);
