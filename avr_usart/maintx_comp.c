@@ -42,31 +42,15 @@ volatile uint8_t num2 = 0x09;
 volatile uint8_t txByte = 0x00;
 volatile int cmd_pcint = 1;
 
-/* volatile uint8_t txBuffer[bufferSize] = {0x00, 0x00, 0x00}; */
-
-
-volatile char txBuffer[bufferSize] = {'0', '0', '0'};
+volatile uint8_t txBuffer[bufferSize] = {0x00, 0x00, 0x00};
 volatile int  txWritePos = 0;
 volatile int  txReadPos = 0;
 
 
-void txPacket(char rxByte, char command){
+void txPacket(uint8_t rxByte, uint8_t command){
     txBuffer[0] = syncByte;
     txBuffer[1] = rxByte;
     txBuffer[2] = command;
-}
-
-char appendRx(void)
-{
-    char ret = '\0';
-    if (rxReadPos != rxWritePos){
-        ret = rxBuffer[rxReadPos];
-        rxReadPos++;
-        if(rxReadPos >= bufferSize){
-            rxReadPos = 0;
-        }
-    }
-    return ret;
 }
 
 
@@ -99,7 +83,6 @@ int main(void){
     DDRB |= (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1) | (1 << PB0);
     PORTB &= ~ (1 << PB4) | (1 << PB3) | (1 << PB2) | ( 1 << PB1 ) | (1 << PB0);
 
-    
     DDRD |= (1 << PD7) | (1 << PD6);
     PORTD &=~ (1 << PD7)| ( 1 << PD6 );
 
@@ -107,6 +90,7 @@ int main(void){
     UBRR0H = (ubbrn >> 8); 
     UBRR0L = ubbrn; 
     ////////////////
+
     uint8_t addr = 0x00;
 
     UCSR0A = 0x00;
@@ -123,26 +107,21 @@ int main(void){
         case ('f'):
             txPacket(rxSerNum, 0x44);
             PORTB |= (1 << PB1);
-            PORTB &=~ (1 << PB0);
             break;
         case('b'):
             txPacket(rxSerNum, 0xCB);
             PORTB |= (1 << PB4);
-            PORTB &=~ (1 << PB0);
             break;
         case('l'):
             txPacket(rxSerNum, 0x62);
             PORTB |=  (1 << PB3);
-            PORTB &=~ (1 << PB0);
             break;
         case('r'):
             txPacket(rxSerNum, 0xFA);
             PORTB |=  (1 << PB2);
-            PORTB &=~ (1 << PB0);
             break;
         case('n'):
             txPacket(rxSerNum, 0x05);
-            PORTB |= (1 << PB0);
             PORTB &=~ (1 << PB1);
             PORTB &=~ (1 << PB4);
             PORTB &=~ (1 << PB3);
@@ -157,9 +136,8 @@ int main(void){
 
 ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
 {
-    if (txReadPos != bufferSize){ //now we are reading the info from the buffer index by index to be transmitted
-        txBuffer[txReadPos] = UDR0; //tx read pos just used to index the buffer data to be transmitted
-//        UDR0 = txBuffer[txReadPos]; //tx read pos just used to index the buffer data to be transmitted
+    if (txReadPos != bufferSize){ //now we are reading the info from the 
+       UDR0 = txBuffer[txReadPos]; //tx read pos just used to index thebuffer data to be transmitted
         txReadPos ++;
         if (txReadPos >= bufferSize){
             txReadPos = 0;
@@ -171,7 +149,7 @@ ISR(USART_RX_vect)
 {
     keyboard_key = UDR0;
     if (keyboard_key == '1'){
-        rxSerNum = num2;
+        rxSerNum = num1;
         PORTD |= (1 << PD7);
         PORTD &=~ (1 << PD6);
     }

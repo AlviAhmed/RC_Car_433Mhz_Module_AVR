@@ -5,7 +5,7 @@ import serial
 import sys
 import threading
 
-port = '/dev/ttyUSB3'
+port = '/dev/ttyUSB0'
 
 class SerialThread(threading.Thread):
  def run(self):

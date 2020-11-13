@@ -26,30 +26,15 @@ volatile uint8_t rxBuffer[bufferSize] = {0x00, 0x00, 0x00};
 volatile int  rxWritePos = 0;
 volatile int  rxReadPos = 0;
 
-volatile uint8_t rxSerNum = 0x0C;
+volatile uint8_t rxSerNum = 0x09;
 
 volatile uint8_t num1 = 0x0C;
 volatile uint8_t num2 = 0x09;
-volatile  uint8_t ser = 0xAA;
+volatile  uint8_t ser = 0x00;
 volatile uint8_t cmd = 0x00;
 volatile uint8_t syn = 0x00;
 
 volatile int enable = 0;
-
-char appendRx(void)
-{
-    char ret = '\0';
-    if (rxReadPos != rxWritePos){
-        ret = rxBuffer[rxReadPos];
-        rxReadPos++;
-        if(rxReadPos >= bufferSize){
-            rxReadPos = 0;
-        }
-    }
-    return ret;
-}
-
-
 
 /*
   PB4 -> 0x44
@@ -107,13 +92,18 @@ int main(void){
                 PORTB |=  (1 << PB2);
                 break;
             case(0x05):
-                PORTB |=  (1 << PB0);
-                allOff();
+                PORTB &=~ (1 << PB4);
+                PORTB &=~ (1 << PB3);
+                PORTB &=~ (1 << PB2);
+                PORTB &=~ (1 << PB1);
                 break;
             }
         }
         else{
-            allOff();
+            PORTB &=~ (1 << PB4);
+            PORTB &=~ (1 << PB3);
+            PORTB &=~ (1 << PB2);
+            PORTB &=~ (1 << PB1);
         }
     }
 
@@ -130,7 +120,7 @@ ISR(USART_RX_vect)
             break;
         case(1):
             ser = rxBuffer[rxWritePos];
-            if (ser == num1){
+            if (ser == num2){
                 enable = 1;
             }
             else{
