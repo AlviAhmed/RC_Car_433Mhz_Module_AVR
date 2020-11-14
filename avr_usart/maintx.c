@@ -93,7 +93,7 @@ int main(void){
     int delay_num = 10;
     while (1){
         if (ser_bool == 0){
-            rxSerNum = num1;
+            rxSerNum = num2;
             PORTD |= (1 << PD2);
             PORTD &=~ (1 << PD3);
         }

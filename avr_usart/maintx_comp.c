@@ -135,18 +135,22 @@ int main(void){
 
 ISR(USART_TX_vect) // once tx buffer is clear, set clear bit to accept new data
 {
-    if (txReadPos != bufferSize){ //now we are reading the info from the 
+     _delay_ms(200);
+    if (txReadPos != bufferSize){ //now we are reading the info from the
        UDR0 = txBuffer[txReadPos]; //tx read pos just used to index thebuffer data to be transmitted
         txReadPos ++;
         if (txReadPos >= bufferSize){
             txReadPos = 0;
         }
     }
+    UDR0 = " ";
+    // UDR0 = keyboard_key;
 }
 
 ISR(USART_RX_vect)
 {
     keyboard_key = UDR0;
+    // UDR0 = keyboard_key;
     if (keyboard_key == '1'){
         rxSerNum = num1;
         PORTD |= (1 << PD7);

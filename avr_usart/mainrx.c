@@ -45,14 +45,21 @@ volatile int enable = 0;
   else -> 0x05
 */
 
-
-void allOff(){
-    PORTB &=~ (1 << PB4);
-    PORTB &=~ (1 << PB3);
-    PORTB &=~ (1 << PB2);
-    PORTB &=~ (1 << PB1);
+void serial_debug(){
+    _delay_ms(10);
+    UDR0 = 'x';
+    _delay_ms(10);
+    UDR0 = syn;
+    _delay_ms(10);
+    UDR0 = 'y';
+    _delay_ms(10);
+    UDR0 = ser;
+    _delay_ms(10);
+    UDR0 = 'z';
+    _delay_ms(10);
+    UDR0 = cmd;
+    _delay_ms(10);
 }
-
 
 int main(void){
     DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1);
@@ -65,8 +72,7 @@ int main(void){
 
     UCSR0A = 0x00;
     //transimit and recieve enable
-    UCSR0B =  (1 << RXEN0) | (1 << RXCIE0);
-    //| (1 << TXEN0) | (1 << TXCIE0);
+    UCSR0B =  (1 << RXEN0) | (1 << RXCIE0) | (1 << TXEN0) | (1 << TXCIE0);
     // UCSR0B = (1 << RXEN0) | (1 << RXCIE0);
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  //8 bit data format
     sei();
@@ -136,7 +142,10 @@ ISR(USART_RX_vect)
     }
     else{
         rxWritePos = -1;
-        allOff();
+        PORTB &=~ (1 << PB4);
+        PORTB &=~ (1 << PB3);
+        PORTB &=~ (1 << PB2);
+        PORTB &=~ (1 << PB1);
     }
     rxWritePos++;
     if (rxWritePos >= bufferSize){
