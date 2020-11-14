@@ -134,7 +134,10 @@ ISR(USART_RX_vect)
     }
     else{
         rxWritePos = -1;
-        allOff();
+        PORTB &=~ (1 << PB4);
+        PORTB &=~ (1 << PB3);
+        PORTB &=~ (1 << PB2);
+        PORTB &=~ (1 << PB1);
     }
     rxWritePos++;
     if (rxWritePos >= bufferSize){
