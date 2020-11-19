@@ -1,44 +1,112 @@
-#+LaTeX_CLASS: mycustom 
-
 #+TITLE: RC Car With 433Mhz and AVR
 #+AUTHOR: Alvi Ahmed
 
-*Status:* Ongoing
+*Status:* Shelved
 *Type:* Personal  
 
 
 * Objective  
 
-To create a RC car using 433Mhz modules and 2 atmega328p
-microcontrollers.  
+  To create a RC car using 433Mhz modules and 2 atmega328p
+  microcontrollers.  
+
+* Latest Results 
+
+*For more pictures, videos and demos*: [[https:][https://hackaday.io/project/163719-rc-avr-car-with-433mhz-modules]]
+
+[[file:pics/car.jpg]]
 
 
-* Logs  
+* Logs  (Latest to Earliest)
 
-** USART   
 
-I am now working on USART communcation. I have noticed that it indeed
-works much better and the previous PWM and duty cycle method, however
-through wireless it is still a bit unreliable. Therefore, with USART I
-need to send multiple bytes for syncing, reciever checking, error
-checking and the byte for the actual command. All easier to do on
-USART the previous method.
+** USART and Pyserial
+
+   I am now working on USART communication. I have noticed that it indeed
+   works much better and the previous PWM and duty cycle method, however
+   through wireless it is still a bit unreliable. Therefore, with USART I
+   need to send multiple bytes for syncing, receiver checking, error
+   checking and the byte for the actual command. All easier to do on
+   USART the previous method. 
+
+*** USART  
+
+   The TX and RX AVRs both have data buffers that are used to
+   store the multiple bytes. When a command is chosen on the TX side,
+   the buffer is filled with the sync byte, serial byte and command
+   byte. Then sent incrementally via TX interrupt. 
+
+   This is the same with the RX AVR, with the RX data buffer being
+   filled up incrementally with received bytes. 
+
+   Initially I did have some trouble using this method, especially with
+   making sure the AVR on the RX would read the data in the proper
+   sequence.  
+
+   To ensure that the data received would be put in the data
+   buffer in the right sequence (sync, RX serial number, command), I
+   made it so that the RX will only fill up the data buffer if the
+   first thing it receives is a sync byte, else reset the RX data
+   buffer index to 0 and keep on waiting for the right sequence. 
+
+   While debugging the RX via serial terminal, I have noticed that the
+   bytes being received appear in the wrong indexes. This is due to the
+   fact that sometimes bytes are sometimes received out of order
+   (i.e. command byte read first then stored or serial byte).  
+
+   However, I noticed that whenever a sync byte is the first byte to be received,
+   every other byte is in the correct sequence. Therefore that is the
+   condition to ensuring a proper data transmission. 
+
+   This may not be the best practice especially if I am planning on
+   sending more and more bytes as a packet. Receiving the sync byte
+   first may not guarantee that everything else will fall into sequence
+   however it is the best solution I have for now. Will develop it more
+   later on.
+
+   Also, I am planning on changing the data type sent from char to
+   bytes. Char was used purely for debugging purposes. 
+
+   For a char data packet, s represents sync, 1 or 2 represents the
+   receiver number and n,f,b,l,r represents neutral, front, back,
+   left, and right respectively. This can be seen in the video of the initial test.
+  
+*** Pyserial 
+
+   For interfacing the AVR with serial, an FTDI232 board module was used.
+
+   To manage sending commands to TX AVR via keyboard I initially tried
+   to use the serial terminal directly by inputting characters
+   in it. However,  I have trouble with continuous input, when I hold
+   down the button, this does not register in the serial term and treats it
+   as 1 press, instead of a continuous press.  
+
+   Therefore I decided to use python and the pyserial and pynput
+   modules. This allows me to not only send multiple bytes to serial
+   while holding a down button, but also it allows me to input keys
+   without having to be in the serial term window due to pynput.  
+
+   Using python also allowed me to later change the input keys from f,
+   b, l, r (corresponding to front, back, left, right), to w, a, s and
+   d keys.  
+
+
 
 ** PWM and varying Duty Cycles
-A couple of methods have been experimented with, I initially tried to
-transmit varying dutying cycles of pwm to the reciever. The different
-duty cycles representing the various directions and functions of the
-RC car. 
+   A couple of methods have been experimented with, I initially tried to
+   transmit varying duty cycles of PWM to the receiver. The different
+   duty cycles representing the various directions and functions of the
+   RC car. 
 
-This plan had a lot of flaws, first of all it a only worked well when
-directly connected to the car via wire. However, once wireless the
-function of the car was very laggy for some inputs and a bit jittery. 
+   This plan had a lot of flaws, first of all it a only worked well when
+   directly connected to the car via wire. However, once wireless the
+   function of the car was very laggy for some inputs and a bit jittery. 
 
-Also, since this was wireless, small changes in duty cycle may not
-register on the recieving end, thus need to make large changes to the
-duty cycles, thus limiting my options for the amount of commands /
-instructions I can transmit.
+   Also, since this was wireless, small changes in duty cycle may not
+   register on the receiving end, thus need to make large changes to the
+   duty cycles, thus limiting my options for the amount of commands /
+   instructions I can transmit.
 
-Leading me to conclude that a more complex system of communication
-needed to be used, where synchronousation can be confirmed / ensured
-and multiple bytes can be sent. i.e. USART, Manchester Encoding and etc.
+   Leading me to conclude that a more complex system of communication
+   needed to be used, where synchronization can be confirmed / ensured
+   and multiple bytes can be sent. i.e. USART, Manchester Encoding and etc.
