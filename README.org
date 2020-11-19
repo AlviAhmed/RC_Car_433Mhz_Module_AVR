@@ -12,7 +12,7 @@
 
 * Latest Results 
 
-*For more pictures, videos and demos*: [[https:][https://hackaday.io/project/163719-rc-avr-car-with-433mhz-modules]]
+*For more pictures, videos and demos*: [[https://hackaday.io/project/163719-rc-avr-car-with-433mhz-modules]]
 
 [[file:pics/car.jpg]]
 
