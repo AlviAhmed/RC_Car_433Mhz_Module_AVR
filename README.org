@@ -16,6 +16,15 @@
 
 [[file:pics/car.jpg]]
 
+Image of the 2 cars used in the demo
+
+[[file:pics/tx.jpg]] 
+
+Image of the connected TX board
+
+[[file:pics/rx.jpg]] 
+
+Image of the made RX boards
 
 * Logs  (Latest to Earliest)
 
