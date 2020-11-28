@@ -1,63 +1,13 @@
 // *******************************************************
 //AVR_USART_ATMEGA328p_TX
 // *******************************************************
-//Specs of the USART:
-// 1 start bit
-// 8 data bits 
-// no parity
-// 1 stop bit
 
-#define F_CPU 16000000UL
-
-#include <stdio.h>
-#include <avr/io.h> 
-#include <avr/fuse.h>
-#include <stdio.h>
-#include <string.h>
-#include <util/delay.h>
-#include <avr/interrupt.h> 
-
-#define prt PORTB
-#define ddr DDRB
-
-#define BAUD 9600 //same rate as in the Makefile baud is in bits per second
-#define ubbrn ((F_CPU/16/BAUD) - 1)
-
-#define but3 (~PINB) & (1 << PB4) // PCINT5
-#define but2 (~PINB) & (1 << PB3) // PCINT4
-#define but1 (~PINB) & (1 << PB2) // PCINT3
-#define but0 (~PINB) & (1 << PB1) // PCINT2
-#define butTog (~PINB) & (1 << PB0) // PCINT0
-
-#define bufferSize 3
-
-
-/* volatile uint8_t rxSerNum = 0x1F; */
-/* volatile uint8_t syncByte = 0xAA; */
-/* volatile uint8_t num1 = 0x1F; */
-/* volatile uint8_t num2 = 0x99; */
-/* volatile uint8_t txByte = 0x00; */
-
-
-volatile int ser_bool = 0;
-volatile char rxSerNum = '1';
-volatile char syncByte = 's'; 
-volatile char num1 = '1';
-volatile char num2 = '2';
-volatile char txByte = '0';
-volatile int cmd_pcint = 1;
-
-/* volatile uint8_t txBuffer[bufferSize] = {0x00, 0x00, 0x00}; */
-
-
-volatile char txBuffer[bufferSize] = {'0', '0', '0'};
-volatile int  txWritePos = 0;
-volatile int  txReadPos = 0;
+#include "tx_header_debug.h"
 
 void nullByteIfEmpty(){
     if (UCSR0A & (1 << UDRE0)) { //if the UDRE register is empty, then send a null byte, just to make sure no junk is put in to the register
         UDR0 = 0x00;
-     }
+    }
 }
 
 void appendTx(char data_byte)
@@ -69,34 +19,33 @@ void appendTx(char data_byte)
     }
 }
 
-
-
 void txPacket(char rxByte, char command){
-    /* appendTx(syncByte); */
-    /* appendTx(rxByte); */
-    /* appendTx(command); */
-    /* nullByteIfEmpty(); */
     txBuffer[0] = syncByte;
-    /* txWritePos++; //increment global write position as you are inputting things into the array */
     txBuffer[1] = rxByte;
-    /* txWritePos++; //increment global write position as you are inputting things into the array */
     txBuffer[2] = command;
-    /* txWritePos++; //increment global write position as you are inputting things into the array */
-    /* if (txWritePos >= bufferSize){ */
-    /*     txWritePos  = 0; */
-    /* } */
 }
 void txPacketNeutral(char command){
     appendTx(command);
     appendTx(command);
     appendTx(command);
-    /* nullByteIfEmpty(); */
+}
+
+void debugging(){
+    UDR0 = 'x';
+    _delay_ms(delay_num);
+    UDR0 = txBuffer[0];
+    _delay_ms(delay_num);
+    UDR0 = 'y';
+    _delay_ms(delay_num);
+    UDR0 = txBuffer[1];
+    _delay_ms(delay_num);
+    UDR0 = 'z';
+    _delay_ms(delay_num);
+    UDR0 = txBuffer[2];
 }
 
 
-
-int main(void){
-
+void init(){
     DDRB |= (1 << PB0);
     PORTB &=~ (1 << PB0);
     DDRD |= (1 << PD2) | (1 << PD3) | ( 1 << PD7 ) | ( 1 << PD6 );
@@ -122,18 +71,12 @@ int main(void){
     PCICR |= (1 << PCIE0);
     sei();
     int delay_num = 10;
+}
+
+
+int main(void){
+    init();
     while (1){
-        /* UDR0 = 'x'; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = txBuffer[0]; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = 'y'; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = txBuffer[1]; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = 'z'; */
-        /* _delay_ms(delay_num); */
-        /* UDR0 = txBuffer[2]; */
         if (ser_bool == 0){
             rxSerNum = num1;
             PORTD |= (1 << PD2);

@@ -6,35 +6,8 @@
 // 8 data bits 
 // no parity
 // 1 stop bit
-#define F_CPU 16000000UL
 
-#include <stdio.h>
-#include <avr/io.h> 
-#include <avr/fuse.h>
-#include <stdio.h>
-
-#include <util/delay.h>
-#include <avr/interrupt.h> 
-#define BAUD 9600 //same rate as in the Makefile baud is in bits per second
-#define ubbrn ((F_CPU/16/BAUD) - 1)
-#define buffer_size 128
-
-#define bufferSize 3
-
-
-volatile uint8_t rxBuffer[bufferSize] = {0x00, 0x00, 0x00};
-volatile int  rxWritePos = 0;
-volatile int  rxReadPos = 0;
-
-volatile uint8_t rxSerNum = 0x09;
-
-volatile uint8_t num1 = 0x0C;
-volatile uint8_t num2 = 0x09;
-volatile  uint8_t ser = 0x00;
-volatile uint8_t cmd = 0x00;
-volatile uint8_t syn = 0x00;
-
-volatile int enable = 0;
+#include "rx_header.h"
 
 /*
   PB4 -> 0x44
@@ -44,34 +17,22 @@ volatile int enable = 0;
   else -> 0x05
 */
 
-
-void allOff(){
-    PORTB &=~ (1 << PB4);
-    PORTB &=~ (1 << PB3);
-    PORTB &=~ (1 << PB2);
-    PORTB &=~ (1 << PB1);
-}
-
-
-int main(void){
+init(){
     DDRB |= (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | (1 << PB1);
     PORTB &= ~ (1 << PB5) | (1 << PB4) | (1 << PB3) | (1 << PB2) | ( 1 << PB1 );
     //High and low bits
     UBRR0H = (ubbrn >> 8); 
     UBRR0L = ubbrn; 
-    ////////////////
-    uint8_t addr = 0x00;
-
     UCSR0A = 0x00;
     //transimit and recieve enable
     UCSR0B =  (1 << RXEN0) | (1 << RXCIE0);
-    //| (1 << TXEN0) | (1 << TXCIE0);
-    // UCSR0B = (1 << RXEN0) | (1 << RXCIE0);
     UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  //8 bit data format
     sei();
-    ////////////////////////////////////////////////////////////////
     UDR0 = 0;
-    int delay_num = 10;
+}
+
+int main(void){
+    init();
     while (1){
         if ( (enable == 1) ){
             switch (cmd){
